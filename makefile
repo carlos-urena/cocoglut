@@ -32,7 +32,7 @@ sl: $(stlib)
 dl: $(dylib)
 
 clean:
-	rm -rf $(exec) $(exec-dl) $(dylib) $(objs)
+	rm -rf $(exec) $(exec-dl) $(dylib) $(stlib) $(objs)
 
 $(exec):	$(objs_tests) $(stlib)
 	$(comp) -o $(exec) $(ld_flags) build/test1.o $(stlib)
