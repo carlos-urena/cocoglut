@@ -43,8 +43,10 @@ Callback function pointer types are defined as follows:
 
 List with files or folders on the root folder
 
-* `makefile`: makefile for compiling the library and for cleaning
-* `bin`: executable files for the simple test program. Two versions: one built with static linking and the other with dynamic link. Removed on a clean.
+* `makefile`:
+   makefile for compiling the library and for cleaning
+* `bin`:
+   executable files for the simple test program. Two versions: one built with static linking and the other with dynamic link. Removed on a clean.
 
 `build`
 Object files, all of them removed on a clean.
