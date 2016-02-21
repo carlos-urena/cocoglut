@@ -39,11 +39,11 @@ Callback function pointer types are defined as follows:
 
 ## Folders structure
 
-(obtained and adapted from:
-    http://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/)
+(obtained and adapted from: http://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/)
+
 List with files or folders on the root folder
 
-**makefile**
+`makefile`
 
 makefile for compiling the library and for cleaning
 
