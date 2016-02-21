@@ -49,22 +49,27 @@ Makefile for compiling the library and for cleaning.
 
 `bin`     
 
-Executable files for the simple test program. There are two executables: one built with static linking and the other with dynamic link. Removed on a clean.
+Folder with executable files for the simple test program. There are two executables:
+
+* `test1`: statically linked version.
+* `test1-dl` dynamically linked version.
+
+Removed on a clean.
 
 `build`   
 
-Object files, all of them removed on a clean.
+Folder with object files, all of them removed on a clean.
 
 `include`  
 
-C/C++ header with the (partial) GLUT api declarations
+Folder which includes the C/C++ header with the (partial) GLUT api declarations (`cocoglut-api.h`)
 
 `lib`
 
-Holds the library, already compiled for Mac OSX projects, there are two versions:
+Folder with the library file, already compiled for Mac OSX projects, there are two versions:
 
-* 'cocoglut.dylib':  dynamic library file
-* 'cocoglut.a': for static linking
+* `cocoglut.dylib`:  dynamic library file
+* `cocoglut.a`: for static linking
 
 Both files are removed on clean.
 
