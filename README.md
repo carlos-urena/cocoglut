@@ -41,14 +41,23 @@ Callback function pointer types are defined as follows:
 
 (obtained and adapted from: http://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/)
 
-List with files or folders on the root folder
+**List with files or folders on the root folder**
 
-Folder or file | Content
--------------- | -------
-`makefile` | Makefile for compiling the library and for cleaning.
-`bin`      | Executable files for the simple test program. There are two executables: one built with static linking and the other with dynamic link. Removed on a clean.
-`build`    |Object files, all of them removed on a clean.
-`include`  | C/C++ header with the (partial) GLUT api declarations
+`makefile`
+
+Makefile for compiling the library and for cleaning.
+
+`bin`     
+
+Executable files for the simple test program. There are two executables: one built with static linking and the other with dynamic link. Removed on a clean.
+
+`build`   
+
+Object files, all of them removed on a clean.
+
+`include`  
+
+C/C++ header with the (partial) GLUT api declarations
 
 `lib`
 
