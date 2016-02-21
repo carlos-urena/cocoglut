@@ -43,24 +43,20 @@ Callback function pointer types are defined as follows:
 
 List with files or folders on the root folder
 
-`makefile`
+* `makefile`: makefile for compiling the library and for cleaning
+* `bin`: executable files for the simple test program. Two versions: one built with static linking and the other with dynamic link. Removed on a clean.
 
-makefile for compiling the library and for cleaning
-
-**bin**
-Executable files for the simple test program. Two versions: one built with static linking and the other with dynamic link. Removed on a clean.
-
-**build**
+`build`
 Object files, all of them removed on a clean.
 
-**include**
+`include
 C/C++ header with the (partial) GLUT api declarations
 
-**lib**
+`lib`
 The library compiled as a Mac OSX dynamic library (cocoglut.dylib) file, and also compiled as a static file (cocoglut.a). Both files are removed on clean.
 
-**src**
+`src`
 C/C++/Objective-C sources for the implementation (headers and units)
 
-**test**
+`test`
 C/C++ source for a simple test program. (includes a makefile for running the test).
