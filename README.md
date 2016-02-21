@@ -61,7 +61,12 @@ C/C++ header with the (partial) GLUT api declarations
 
 `lib`
 
-The library compiled as a Mac OSX dynamic library (cocoglut.dylib) file, and also compiled as a static file (cocoglut.a). Both files are removed on clean.
+Holds the library, already compiled for Mac OSX projects, there are two versions:
+
+* 'cocoglut.dylib':  dynamic library file
+* 'cocoglut.a': for static linking
+
+Both files are removed on clean.
 
 `src`
 
