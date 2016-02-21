@@ -45,7 +45,6 @@ List with files or folders on the root folder
 
 Folder or file | Content
 -------------- | -------
-
 `makefile` | makefile for compiling the library and for cleaning
 `bin` | executable files for the simple test program. Two versions: one built with static linking and the other with dynamic link. Removed on a clean.
 
