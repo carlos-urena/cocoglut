@@ -3,7 +3,7 @@
 
 This project is aimed at obtaining a basic implementation of GLUT API for OSX, where 'basic' means to provide the ability for creating/destroying windows and handling redraw, keyboard, mouse, idle and timer events. This implementation uses the COCOA framework, so you can take advantage of full retina display resolution. Current version seems to work correctly, at least for the test program in the repository. You can select to use either an OpenGL 2.0 or an OpenGL 4.0 rendering context, although this is still not exposed in the API.
 
-The current (Dic-15) solution provided by Apple is an implementation for GLUT which runs over XQuartz, thus halving retina display resolution. Building the library does not requires any XCode IDE project files, it can be built and linked from the command line. It neither uses any nib file. The code is written in Objective-C++ (mixed with C++), and the API can be used from C, C++ or Objective-C++ written applications.
+The current (December 2015) solution provided by Apple is an implementation for GLUT which runs over XQuartz, thus halving retina display resolution. Building the library does not requires any XCode IDE project files, it can be built and linked from the command line. It neither uses any nib file. The code is written in Objective-C++ (mixed with C++), and the API can be used from C, C++ or Objective-C++ written applications.
 
 ## List of already implemented GLUT functions:
 
