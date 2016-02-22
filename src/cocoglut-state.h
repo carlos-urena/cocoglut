@@ -112,6 +112,7 @@ class LibraryState
    // idle callback managing
    bool             idleObsReg; // 'true' if idle notification observer already registered
    IdleCBPType      idleCBP;    // idle callback funtion pointer (NULL when not set)
+   TimerCBPType     timerCBP ;  // timer callback function pointer (NULL when not set)
    NSNotification * idleNotification ; // idle notification object
 
 
@@ -168,6 +169,7 @@ class LibraryState
       idleNotification = NULL ;
       idleObsReg       = false ;
       idleCBP          = NULL ;
+      timerCBP         = NULL ;
    }
 
    // ------------------------------------------------------------------
