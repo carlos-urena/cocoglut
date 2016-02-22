@@ -120,7 +120,7 @@ void glutReshapeFunc( ReshapeCBPType func )
 }
 // ---------------------------------------------------------------------
 
-void glutMotionFunc( MotionCBPType func ) 
+void glutMotionFunc( MotionCBPType func )
 {
    GetState()->motionFunc( func ) ;
 }
@@ -129,6 +129,11 @@ void glutMotionFunc( MotionCBPType func )
 void glutIdleFunc( IdleCBPType func )
 {
     GetState()->idleFunc( func ) ;
+}
+
+void glutTimerFunc( unsigned int msecs, TimerCBPType func, int value )
+{
+    GetState()->timerFunc( msecs, func, value );
 }
 
 // *********************************************************************

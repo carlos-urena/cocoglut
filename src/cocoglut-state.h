@@ -29,9 +29,9 @@
 #import <cocoglut-view.h>
 #import <cocoglut-app-del.h>
 
-//#define logd( msg )  cout << "cocoglut: debug: " << msg << endl << flush 
-#define logd( msg )   
-   
+//#define logd( msg )  cout << "cocoglut: debug: " << msg << endl << flush
+#define logd( msg )
+
 
 // *********************************************************************
 
@@ -50,10 +50,10 @@ struct WinCallbackPointers
    MouseCBPType    mouseCBP ;
    ReshapeCBPType  reshapeCBP ;
    MotionCBPType   motionCBP ;
-   
+
    WinCallbackPointers()
    {
-      keyboardCBP = NULL ;   
+      keyboardCBP = NULL ;
       specialCBP  = NULL ;
       displayCBP  = NULL ;
       mouseCBP    = NULL ;
@@ -61,20 +61,20 @@ struct WinCallbackPointers
       motionCBP   = NULL ;
    }
 } ;
-   
+
 // *********************************************************************
 // struct used for a window state data
 
 class WindowState
 {
    public:
-   
+
    NSWindow *          cocoaWindow ; // reference to Cocoa window object
    ccg_OpenGLView *    cocoaView ;   // reference to Cocoa OpenGL view object
-   int                 id ;          // window id (1 plus its position in window state vector) 
+   int                 id ;          // window id (1 plus its position in window state vector)
    WinCallbackPointers callbacks ;   // set of callback pointers for this window
    bool                isClosed ;    // true if the window has been already closed
-   
+
    WindowState()
    {
       cocoaWindow = NULL ;
@@ -90,25 +90,25 @@ class WindowState
 class LibraryState
 {
    private:
-   
+
    // attributes for next window to be created
-   int nextWinPosX,  // x position 
-       nextWinPosY,  // y position 
-       nextWinSizeX, // x size 
-       nextWinSizeY; // y size 
-            
+   int nextWinPosX,  // x position
+       nextWinPosY,  // y position
+       nextWinSizeX, // x size
+       nextWinSizeY; // y size
+
    // window state info
    unsigned windowCount;  // total number of created windows
    int      currWinId ;   // identifier of the current window (0 implies there is no current window)
    bool     initCalled;   // 'true' after 'glutInit' called, 'false' before
-   
+
    std::vector<WindowState *> ws ;  // window state for all created windows (size()==windowCount)
 
    // cocoa application and application delegate
-   NSAutoreleasePool *  pool ;   // autorelease pool used to free something 
-   NSApplication *      app ;    // reference to main application singleton object 
+   NSAutoreleasePool *  pool ;   // autorelease pool used to free something
+   NSApplication *      app ;    // reference to main application singleton object
    ccg_AppDelegate *    appDel ; // application delegate singleton object
-   
+
    // idle callback managing
    bool             idleObsReg; // 'true' if idle notification observer already registered
    IdleCBPType      idleCBP;    // idle callback funtion pointer (NULL when not set)
@@ -117,48 +117,48 @@ class LibraryState
 
    // ******************************************************************
    // aux methods
-   
+
    // checks init has been called (exits when it has not)
-   void checkInit() ;          
-   
+   void checkInit() ;
+
    // returns window state pointer in 'ws':
    //
    // ** if the state is inconsistent or 'winId' is invalid, aborts
    // ** if the window has been closed, returns NULL
    // ** otherwise: return pointer to window state in ws
-   
+
    WindowState * getWindowState( int winId ) ;
-   
+
    // returns window state pointer for current window in 'ws', after these checks
    //
    // ** if there is no current window, aborts
    // ** if the current window has been closed, aborts
    // ** otherwise, returns the pointer (which will be allways non-null)
-   
+
    WindowState * getCurrentWindowState() ;
 
    // creates a pixel format for an opengl view (must be called before creating the view)
-   NSOpenGLPixelFormat * createPixelFormat() ;         
-   
+   NSOpenGLPixelFormat * createPixelFormat() ;
+
    // prints debug state info on 'cout'
    void debugState() ;
-   
-   
+
+
    // ******************************************************************
    // public methods
-   
+
    public:
-   
+
    // ------------------------------------------------------------------
    // inline constructor, sets default or initial values
-   
+
    LibraryState()
    {
-      // executed just after executable is loaded on RAM, 
+      // executed just after executable is loaded on RAM,
       // do NOT use Cocoa/OpenGL functionality here
-      nextWinPosX      = 256 , 
-      nextWinPosY      = 256 , 
-      nextWinSizeX     = 512 , 
+      nextWinPosX      = 256 ,
+      nextWinPosY      = 256 ,
+      nextWinSizeX     = 512 ,
       nextWinSizeY     = 512 ;
       windowCount      = 0 ;
       currWinId        = 0 ; // identifier of the current window ( 0 --> there is no current window )
@@ -169,12 +169,12 @@ class LibraryState
       idleObsReg       = false ;
       idleCBP          = NULL ;
    }
-  
+
    // ------------------------------------------------------------------
    // methods called from one of the opengl views or window delegate, when
    // cocoa user events occurr or when redraw or reshape is neccesary,
    // or when a window will be closed
-   
+
    void windowWillClose( const int windowId ) ;
    void drawRect( const int windowId, const NSRect * bounds ) ;
    void reshape( const int windowId ) ;
@@ -182,14 +182,14 @@ class LibraryState
 
    // ------------------------------------------------------------------
    // called from the application delegate singleton
-   
+
    void appWillFinishLaunching  ( NSNotification * notification ) ;
    void appDidFinishLaunching   ( NSNotification * notification ) ;
    void idleNotificationReceived( NSNotification * notification ) ;
-   
+
    // ------------------------------------------------------------------
    // glut API methods for callback registration
-   
+
    void keyboardFunc ( KeyboardCBPType func ) ;
    void specialFunc  ( SpecialCBPType  func ) ;
    void displayFunc  ( DisplayCBPType  func ) ;
@@ -197,23 +197,25 @@ class LibraryState
    void reshapeFunc  ( ReshapeCBPType  func ) ;
    void motionFunc   ( MotionCBPType   func ) ;
    void idleFunc     ( IdleCBPType     func ) ;
+   void timerFunc    ( unsigned int msecs, TimerCBPType func, int value ) ;
+
 
    // ------------------------------------------------------------------
    // glut API methods for window management and initialization
-   
+
    int  createWindow       ( const char *name ) ;
    void destroyWindow      ( int win );
    int  getWindow          ( ) ;
    void setWindow          ( int win );
    void swapBuffers        ( ) ;
-   
+
    void init               ( int *argcp, char **argv ) ;
    void initWindowPosition ( int x, int y ) ;
    void initWindowSize     ( int width, int height );
    void mainLoop           ( ) ;
    void postRedisplay      ( ) ;
 
-   
+
 
 
 } ; // end class LibraryState.

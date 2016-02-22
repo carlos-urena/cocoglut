@@ -40,17 +40,17 @@ namespace cocoglut
 {
 
 // *********************************************************************
-// library state singleton (created on binary load) 
+// library state singleton (created on binary load)
 
 static LibraryState libraryState ;
 
 // ---------------------------------------------------------------------
 // returns the library state singleton
 
-LibraryState * GetState() 
+LibraryState * GetState()
 {
    return &libraryState ;
-   
+
 }
 
 // *********************************************************************
@@ -69,16 +69,16 @@ void LibraryState::checkInit()
 WindowState * LibraryState::getWindowState( int winId )
 {
    checkInit() ;
-   
-   
+
+
    if ( winId > windowCount || windowCount > ws.size() || winId <= 0 )
    {
       cout << "cocoglut: error: inconsistent state or window id in 'getWindowState'." << endl ;
       exit(1);
    }
-   
+
    WindowState * winSt = ws[winId-1] ;
-   
+
    if ( winSt == NULL )
    {
       cout << "cocoglut: error: current window is NULL." << endl ;
@@ -86,13 +86,13 @@ WindowState * LibraryState::getWindowState( int winId )
    }
    if ( winSt->isClosed )
       return NULL ;   // NULL return value means the window was already closed
-   
+
    if ( winSt->cocoaWindow == NULL || winSt->cocoaView == NULL )
    {
       cout << "cocoglut: error: the window (winId) has NULL cocoa window or NULL cocoa view, but is not closed !!" << endl ;
       exit(1);
    }
-   
+
    return winSt ;
 }
 // ---------------------------------------------------------------------
@@ -115,7 +115,7 @@ NSOpenGLPixelFormat * LibraryState::createPixelFormat()
 {
    // see:
    // http://stackoverflow.com/questions/11602406/opengl-3-2-w-nsopenglview
-   
+
    NSOpenGLPixelFormatAttribute attrs[] =
    {
       NSOpenGLPFADoubleBuffer,
@@ -134,7 +134,7 @@ NSOpenGLPixelFormat * LibraryState::createPixelFormat()
       cout << "cocoglut: error: cannot create required pixel format for the OpenGL view." << endl << flush ;
       exit(1);
    }
-   
+
    return pf ;
    //return [NSOpenGLView defaultPixelFormat] ; // we could use this for the default pixel format
 }
@@ -146,20 +146,20 @@ void LibraryState::debugState()
    logd( "LibraryState::debugState") ;
    logd( "     app key window: == " << app.keyWindow);
    logd( "     window list == ");
-   
+
    for( unsigned i = 0 ; i < ws.size() ; i++ )
       logd( "                " << (i+1) << " window == " << ws[i]->cocoaWindow );
-   
+
    logd( "**** end" );
 }
 
 
 // -----------------------------------------------------------------------------
 
-void LibraryState::drawRect( const int windowId, const NSRect * bounds ) 
+void LibraryState::drawRect( const int windowId, const NSRect * bounds )
 {
    logd( "LibraryState::drawRect begins, window id   == " << windowId ) ;
-   
+
    // get window state, return if closed
    WindowState * cws = getWindowState( windowId ) ;
    if ( cws == NULL )   // means the window is closed
@@ -171,47 +171,47 @@ void LibraryState::drawRect( const int windowId, const NSRect * bounds )
    DisplayCBPType displayCBP = cws->callbacks.displayCBP ;
    if (  displayCBP == NULL )
       return ;
-   
+
    // make current and invoke callback
    currWinId = windowId ;
    displayCBP() ;
-   
+
 }
 // -----------------------------------------------------------------------------
-   
+
 void LibraryState::reshape( const int windowId )
 {
    logd( "begins LibraryState::reshape(" << windowId << ")" ) ;
-   
+
    // get window state, return if closed
    WindowState * cws = getWindowState( windowId ) ;
    if ( cws == NULL )   // means the window is closed
-   {  
+   {
       logd("    reshape: window was closed " ) ;
       return ;
    }
-   
+
    // get info about the new frame
    NSRect  frame = [cws->cocoaView frame] ;
    logd("    frame orig == " << frame.origin.x  << " , " << frame.origin.y ) ;
    logd("    frame size == " << frame.size.width << " x " << frame.size.height ) ;
-   
-   // compute pixels units 
+
+   // compute pixels units
    const int factor = 2 ; // should use cocoa conversion functions here!!!
    const int pixWidth   = int(frame.size.width * factor),
              pixHeight  = int(frame.size.height * factor);
-   
-   
+
+
    // get callback pointer and return when NULL
    ReshapeCBPType reshapeCBP = cws->callbacks.reshapeCBP ;
    if (  reshapeCBP == NULL )
-   {  
+   {
       // we must call glViewport here, according to glut standard
       glViewport( 0,0, pixWidth,pixHeight ) ;
       logd( "ends reshape(" << windowId << ")  (not handled: no callback registered)" ) ;
       return ;
    }
-   
+
    // make current and invoke callback
    currWinId = windowId ;
    reshapeCBP( pixWidth, pixHeight ) ;
@@ -219,10 +219,10 @@ void LibraryState::reshape( const int windowId )
 }
 // ---------------------------------------------------------------------
 
-bool LibraryState::handleEvent( const int windowId, NSEvent * event ) 
+bool LibraryState::handleEvent( const int windowId, NSEvent * event )
 {
    logd("LibraryState::handleEvent, window id  == " << windowId ) ;
-   
+
    // get window state, return if closed
    WindowState * cws = getWindowState( windowId ) ; // get window state data
    if ( cws == NULL )
@@ -242,7 +242,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
    std::string   typeDesc ;              // cocoa event type descriptor string (for debug)
    int           mouseButton,            // glut code for button pressed on mouse events
                  typeUpDown;             // glut code for type up/down (both for mouse and keys)
-   
+
    // set glut event data from cocoa event type
    switch( event.type )
    {
@@ -292,28 +292,28 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
          typeUpDown  = GLUT_UP ;
          break ;
       default:
-         typeDesc    = "Other/unknown" ; 
+         typeDesc    = "Other/unknown" ;
          break ;
    }
-   
+
    logd(" ##### event type == " << typeDesc ) ;
-   
+
    // invoke appropiate callback (if any callback is registered)
    if ( isMouse )
    {
       NSPoint      mousePos = event.locationInWindow ;
       int          pos_x    = (int)round(mousePos.x),
                    pos_y    = (int)round(mousePos.y) ;
-                   
+
       logd( "    mouse pos x  == " << pos_x );
       logd( "    mouse pos y  == " << pos_y );
-           
-      
+
+
       if ( isDragged )   // mouse moved with left button clicked
       {
          MotionCBPType motionCBP = cws->callbacks.motionCBP ;
          if ( motionCBP != NULL )
-         {  
+         {
             // make window the current window and actually invoke callback
             currWinId = windowId ;
             motionCBP( pos_x, pos_y );
@@ -324,7 +324,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       {
          MouseCBPType mouseCBP = cws->callbacks.mouseCBP ;
          if ( mouseCBP != NULL )
-         {  
+         {
             // make window the current window and actually invoke callback
             currWinId = windowId ;
             mouseCBP( mouseButton, typeUpDown, pos_x, pos_y );
@@ -334,10 +334,10 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
    }
    else if ( isKey && typeUpDown == GLUT_DOWN )  // it looks like glut ignores key release.....¿?
    {
-      
-      // see apple docs: 
+
+      // see apple docs:
       // https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/EventOverview/HandlingKeyEvents/HandlingKeyEvents.html#//apple_ref/doc/uid/10000060i-CH7-SW1
-      
+
       const char *    charsCStr     = [event.characters UTF8String];
       NSString *      charactersIM  = [event charactersIgnoringModifiers],
                *      characters    = [event characters] ;
@@ -345,29 +345,29 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       unsigned short  keyCode       = event.keyCode ;
       unsigned int    specialKey ;           // arrow key glut code
       std::string     skd ;                  // special key description
-      
+
       // check for special arrow keys
-      if ([event modifierFlags] & NSNumericPadKeyMask) 
+      if ([event modifierFlags] & NSNumericPadKeyMask)
       {
          if ( [charactersIM length] == 1 )
          {
             unichar keyChar = [charactersIM characterAtIndex:0];
             isSpecial = true ;
             switch( keyChar )
-            {  
-               case NSLeftArrowFunctionKey: 
+            {
+               case NSLeftArrowFunctionKey:
                   specialKey = GLUT_KEY_LEFT ;
                   skd = "left arrow" ;
                   break ;
-               case NSRightArrowFunctionKey: 
+               case NSRightArrowFunctionKey:
                   specialKey = GLUT_KEY_RIGHT ;
                   skd = "right arrow" ;
                   break ;
-               case NSUpArrowFunctionKey: 
+               case NSUpArrowFunctionKey:
                   specialKey = GLUT_KEY_UP ;
                   skd = "up arrow" ;
                   break ;
-               case NSDownArrowFunctionKey: 
+               case NSDownArrowFunctionKey:
                   specialKey = GLUT_KEY_DOWN ;
                   skd = "down arrow" ;
                   break ;
@@ -377,7 +377,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
             }
          }
       }
-      
+
       NSPoint mousePos = event.locationInWindow ;
       int     pos_x    = (int)round(mousePos.x) ,
               pos_y    = (int)round(mousePos.y) ;
@@ -386,11 +386,11 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       {
          logd("    key type     == special" );
          logd("    key descr.   == " << skd );
-         
+
          SpecialCBPType specialCBP = cws->callbacks.specialCBP ;
-      
-         if ( specialCBP != NULL  )   
-         {  
+
+         if ( specialCBP != NULL  )
+         {
             // make window the current window and actually invoke callback
             currWinId = windowId ;
             specialCBP( specialKey, pos_x, pos_y );
@@ -399,14 +399,14 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       }
       else  // normal key
       {
-         logd( "    key type    == normal" ) ; 
+         logd( "    key type    == normal" ) ;
          logd( "    key code    == " << keyCode )  ;
          logd( "    characters  == '" << charsCStr << "'" )  ;
-         
+
          KeyboardCBPType keyboardCBP = cws->callbacks.keyboardCBP ;
-      
+
          if ( keyboardCBP != NULL && strlen(charsCStr) > 0 )   // todo: call a function to compute whether it is a normal char or not
-         {  
+         {
             unsigned char first = charsCStr[0] ;
             // make window the current window and actually invoke callback
             currWinId = windowId ;
@@ -415,12 +415,12 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
          }
       } // end if ( isSpecial ....)
    } // end if ( isKey .... )
-   else if ( isKey && typeUpDown == GLUT_UP ) 
+   else if ( isKey && typeUpDown == GLUT_UP )
    {
       handled = true ;  // avoid cococa beep on key up (we state we handled it)
    }
-   
-   
+
+
    // debug report
    if ( handled )
       logd( " event handled" ) ;
@@ -432,14 +432,14 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
 }
 // ---------------------------------------------------------------------
 
-void LibraryState::appWillFinishLaunching( NSNotification * notification ) 
+void LibraryState::appWillFinishLaunching( NSNotification * notification )
 {
    if ( windowCount == 0 || windowCount != ws.size() )
    {
       cout << "cocoglut: error at 'LibraryState::appWillFinishLaunching', inconsisten state or no windows created before?" << endl << flush ;
       exit(1) ;
    }
-   
+
    // link every view to its window
    for( unsigned i = 0 ; i < ws.size() ; i++ )
    {
@@ -453,9 +453,9 @@ void LibraryState::appWillFinishLaunching( NSNotification * notification )
 }
 // ---------------------------------------------------------------------
 
-void LibraryState::appDidFinishLaunching( NSNotification * notification ) 
+void LibraryState::appDidFinishLaunching( NSNotification * notification )
 {
-   
+
    if ( appDel == NULL )
    {
       cout << "cocoglut: error: - no appDel in 'LibraryState::appDidFinishLaunching'" << endl << flush ;
@@ -466,11 +466,11 @@ void LibraryState::appDidFinishLaunching( NSNotification * notification )
       cout << "cocoglut: error: ('LibraryState::appDidFinishLaunching'), no windows created before?" << endl << flush ;
       exit(1) ;
    }
-   
+
    // show every window and link it with the app delegate
-   
+
    for( unsigned i = 0 ; i < ws.size() ; i++ )
-   {  
+   {
       if ( ! ws[i]->isClosed )
       {
          NSWindow * win = ws[i]->cocoaWindow ;
@@ -483,34 +483,34 @@ void LibraryState::appDidFinishLaunching( NSNotification * notification )
 // ---------------------------------------------------------------------
 // creates a new window, 'name' can be utf-8
 
-int LibraryState::createWindow( const char *name )  
+int LibraryState::createWindow( const char *name )
 {
    logd("begins LibraryState::createWindow(" << name << ")" ) ;
-   
+
    checkInit() ;
 
    // increase window counter and save new window id
    windowCount ++ ;
    unsigned newWinId = windowCount ;
-   
+
    // create a reference rect (arreglar)
-   NSRect contentSize = NSMakeRect((float)nextWinPosX,  (float)nextWinPosX, 
+   NSRect contentSize = NSMakeRect((float)nextWinPosX,  (float)nextWinPosX,
                                    (float)nextWinSizeX, (float)nextWinSizeY );
 
    // allocate window
-   NSWindow * newWindow = [[NSWindow alloc] 
+   NSWindow * newWindow = [[NSWindow alloc]
       initWithContentRect: contentSize
       styleMask:           NSTitledWindowMask |
                            NSClosableWindowMask |
                            NSMiniaturizableWindowMask |
-                           NSResizableWindowMask 
-      backing:             NSBackingStoreBuffered 
+                           NSResizableWindowMask
+      backing:             NSBackingStoreBuffered
       defer:               YES   // will it be shown on 'app did finish launch....' event
       //defer:               NO
    ];
 
    newWindow.title = [NSString stringWithUTF8String:name] ;
-   
+
    // create the pixel format 'pf' for the view
    NSOpenGLPixelFormat *pf = createPixelFormat() ;
 
@@ -519,27 +519,27 @@ int LibraryState::createWindow( const char *name )
    //    https://www.opengl.org/discussion_boards/showthread.php/178916-Using-the-retina-display-on-a-macbook-pro
    //    https://developer.apple.com/library/mac/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/CapturingScreenContents/CapturingScreenContents.html
    //    https://developer.apple.com/library/mac/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Introduction/Introduction.html
-        
+
    ccg_OpenGLView * newView = [[ccg_OpenGLView alloc] initWithFrame:contentSize pixelFormat: pf];
-   
+
    // falta: view == NULL?
-   
+
    newView->windowId = newWinId ;
    newView->ls       = this ;
-   
+
    [newView setWantsBestResolutionOpenGLSurface: YES] ;
-   
+
    // crate delegate and link it to the library
-   
+
    ccg_WindowDelegate * winDel = [ccg_WindowDelegate alloc] ;
-   
+
    winDel->windowId   = newWinId ;
    winDel->ls         = this ;
    newWindow.delegate = winDel ;
 
    // create window state object and add it to the list in 'ws'
    WindowState * nws = new WindowState ;
-   
+
    nws->cocoaWindow = newWindow ;
    nws->cocoaView   = newView ;
    nws->id          = newWinId ;
@@ -547,19 +547,19 @@ int LibraryState::createWindow( const char *name )
    ws.push_back( nws ) ;
 
    // ????? quite probably not needed at all
-   
-   [newWindow makeFirstResponder:newView]; 
+
+   [newWindow makeFirstResponder:newView];
    newWindow.initialFirstResponder= newView ;
- 
+
    [newWindow makeKeyWindow];
-   
+
    // just debugging
    bool cbkw = newWindow.canBecomeKeyWindow ;
    logd(" window.canBecomeKeyWindow: returns  [" <<  cbkw <<"]" ) ;
 
    // the window becomes the current window
    currWinId = newWinId ;
-   
+
    logd("ends: LibraryState::createWindow(" << name << "), window id == " << currWinId ) ;
 
    // done. return new window identifier:
@@ -568,10 +568,10 @@ int LibraryState::createWindow( const char *name )
 
 // ---------------------------------------------------------------------
 // called from ccg_WindowDelegate whenever a cocoa window is to be closed,
-// both when it is programatically  closed (from glutDestroyWindow) 
+// both when it is programatically  closed (from glutDestroyWindow)
 // and when the close button is clicked
 
-void LibraryState::windowWillClose( const int windowId ) 
+void LibraryState::windowWillClose( const int windowId )
 {
    logd( "begins: LibraryState::windowWillClose(" << windowId << ")" ) ;
 
@@ -583,16 +583,16 @@ void LibraryState::windowWillClose( const int windowId )
    }
    if ( windowId == currWinId )  // required by the api spec
       currWinId = 0 ;
-   
+
    // save window and view for later use in this function ¿?
    NSWindow *     oldWin  = dws->cocoaWindow ;
    ccg_OpenGLView * oldView = dws->cocoaView ;
-   
+
    // reset the entry in 'ws' array
    dws->isClosed    = true ;  // mark as closed
    dws->cocoaWindow = NULL ;  // unlink from library state
    dws->cocoaView   = NULL ;  // unlink from library state
-   
+
    // if there are no more opened windows, terminate the app
    unsigned openCount = 0 ;
    for( unsigned i = 0 ; i < ws.size() ; i++ )
@@ -601,23 +601,23 @@ void LibraryState::windowWillClose( const int windowId )
       if ( ! ws[i]->isClosed )
          openCount ++ ;
    }
-      
+
    logd( "open count == " << openCount ) ;
-   
+
    // exit the loop if there are no more opened windows
-   // this is non standard: glut states 'glutMainLopps' never returns   
-   //if ( openCount == 0 ) 
-   //   [app stop: nil] ;  
+   // this is non standard: glut states 'glutMainLopps' never returns
+   //if ( openCount == 0 )
+   //   [app stop: nil] ;
 }
 
 // ---------------------------------------------------------------------
 // destroys the window:
 // https://www.opengl.org/resources/libraries/glut/spec3/node19.html
-   
+
 void LibraryState::destroyWindow( int win )
 {
    logd( "begins LibraryState::destroyWindow(" << win << ")" ) ;
-   
+
    WindowState * dws = getWindowState( win ) ;
    if ( dws == NULL )
    {
@@ -626,14 +626,14 @@ void LibraryState::destroyWindow( int win )
    }
    if ( win == currWinId )  // required by the api spec
       currWinId = 0 ;
-   
-   // calls 'windowWillClose', then close 
-   [dws->cocoaWindow close] ;     
+
+   // calls 'windowWillClose', then close
+   [dws->cocoaWindow close] ;
 }
-   
+
 // ---------------------------------------------------------------------
 // returns current window id, 0 if there is no current window
-   
+
 int LibraryState::getWindow()
 {
    return currWinId ;
@@ -654,18 +654,18 @@ void LibraryState::setWindow( int win )
 
 // ---------------------------------------------------------------------
 
-void LibraryState::swapBuffers( ) 
+void LibraryState::swapBuffers( )
 {
    // we could check whether redisplay callback is running or not
    // and emit an error when it is not. Here, we just assume it is.
-   
+
    WindowState * cws = getCurrentWindowState(); // requires a current window
-   
+
    // wait for all pending opengl commands to terminate
    glFlush() ;
-   // actually swap buffers: 
+   // actually swap buffers:
    glSwapAPPLE() ;
-   
+
 }
 
 // ---------------------------------------------------------------------
@@ -678,39 +678,39 @@ void LibraryState::init( int *argcp, char **argv )
       cout << "cocoglut: error: 'glutInit' called twice." << endl ;
       exit(1);
    }
-   
+
    logd( "begins: LibraryState::init" ) ;
-   
+
    // create an autorelease pool
    pool = [[NSAutoreleasePool alloc] init];
-   
+
    // make sure the application singleton has been instantiated, and
    // get a reference to it.
    app  = [NSApplication sharedApplication];
-   
-   
+
+
    // just testing.....
    NSMenu* theMenu = [[[app mainMenu] itemAtIndex:0] submenu];
    theMenu.title = @"COCO Glut App" ;
-   
+
    // configure the application singleton
    // needed: see: http://www.cocoawithlove.com/2010/09/minimalist-cocoa-programming.html
    // (if this is not done, key events are not send to the views)
    [app setActivationPolicy:NSApplicationActivationPolicyRegular];
-   
-   // instantiate our new application delegate 
+
+   // instantiate our new application delegate
    appDel = [[[ccg_AppDelegate alloc] init] autorelease];
-   
+
    // set 'ls' pointer in the app delegate.
    // allows accessing this state object from the app delegate
-   appDel->ls = this ; 
-   
+   appDel->ls = this ;
+
    // assign our delegate to the NSApplication
    [app setDelegate: (id)appDel]; // cua: added "(id)"
-   
+
    // register call to 'glutInit
    initCalled = true ;
-   
+
    logd( "ends: LibraryState::init") ;
 }
 // ---------------------------------------------------------------------
@@ -718,7 +718,7 @@ void LibraryState::init( int *argcp, char **argv )
 void LibraryState::initWindowPosition( int x, int y )
 {
    checkInit();
-   
+
    nextWinPosX = x ;
    nextWinPosY = y ;
 }
@@ -727,12 +727,12 @@ void LibraryState::initWindowPosition( int x, int y )
 void LibraryState::initWindowSize( int width, int height )
 {
    checkInit() ;
-   
+
    nextWinSizeX = width ;
    nextWinSizeY = height ;
 }
 
-   
+
 // -----------------------------------------------------------------------------
 
 void LibraryState::idleNotificationReceived( NSNotification * notification )
@@ -741,27 +741,27 @@ void LibraryState::idleNotificationReceived( NSNotification * notification )
    logd( "begins: LibraryState::idleNotificationReceived, counter = " << counter ) ;
    counter++ ;
    assert( idleNotification != NULL );
-   
+
    if ( idleCBP == NULL )  // may have been deactivted after idle notification posted
-   {  
+   {
       logd( "ends : idleNotificationReceived (callback is set to NULL)" ) ;
       return ;             // (notification is not re-posted, so callback is not called anymore)
    }
-      
+
    // actually call idle callback:
-   // (the callback is responsible for setting the current window, if needed, 
+   // (the callback is responsible for setting the current window, if needed,
    //  according to the glut standard)
-   
+
    idleCBP() ;
 
    // enque the notification in the default notification queue
    // (re-post notification, so callback will be called again)
-   
+
    [[NSNotificationQueue defaultQueue]
       enqueueNotification : idleNotification
       postingStyle        : NSPostWhenIdle
    ];
-   
+
    logd( "ends : LibraryState::idleNotificationReceived (notification has been reposted)" ) ;
 }
 
@@ -773,14 +773,14 @@ void LibraryState::idleFunc( IdleCBPType func )
 {
    logd( " begins: LibraryState::idleFunc"  ) ;
    checkInit() ;
-   
+
    // save function pointer, when it is NULL, do nothing more
    idleCBP = func ;
    if ( idleCBP == NULL )
       return ;
 
    // the first time a idle callback is set:
-   // register for notification observation on the appDelegate 
+   // register for notification observation on the appDelegate
    if ( ! idleObsReg )
    {
       [[NSNotificationCenter defaultCenter]
@@ -791,17 +791,17 @@ void LibraryState::idleFunc( IdleCBPType func )
       ];
       idleObsReg = true ;
    }
-   
+
    // re-create notification object
    // (if it is re-used here, a core dump is obtained  ¿¿??)
-   
+
    idleNotification =
          [NSNotification
             notificationWithName : @"CocoglutIdleNotification"
             object               : NULL //(id)this //myIdleHandlerObject
          ];
    assert( idleNotification != NULL ) ;
-   
+
    // enque the notification in the default notification queue
    // (this causes the notification to be posted the first time)
 
@@ -809,18 +809,26 @@ void LibraryState::idleFunc( IdleCBPType func )
       enqueueNotification  : idleNotification
       postingStyle         : NSPostWhenIdle
    ];
-   
+
    logd( "ends : LibraryState::idleFunc" ) ;
 }
-   
+
 // -----------------------------------------------------------------------------
-   
+
+void LibraryState::timerFunc( unsigned int msecs, TimerCBPType func, int value )
+{
+    cerr << "LibraryState::timerFunc not implemented" << endl << flush ;
+    exit(1);
+}
+
+// -----------------------------------------------------------------------------
+
 void LibraryState::mainLoop( )
 {
-   
+
    logd( "begins: LibraryState::mainLoop" ) ;
    checkInit() ;
-   
+
    if ( windowCount == 0 )
    {
       cout << "osxglut: error: 'glutMainLoop' called before any call to 'glutCreateWindow'." << endl ;
@@ -829,7 +837,7 @@ void LibraryState::mainLoop( )
 
    // call the run method of our application
    [app run];
-    
+
    // drain the autorelease pool
    [pool drain];
 
@@ -882,7 +890,7 @@ void LibraryState::reshapeFunc( ReshapeCBPType func )
 }
 // ---------------------------------------------------------------------
 
-void LibraryState::motionFunc( MotionCBPType func ) 
+void LibraryState::motionFunc( MotionCBPType func )
 {
    WindowState * cws = getCurrentWindowState();
    cws->callbacks.motionCBP = func ;

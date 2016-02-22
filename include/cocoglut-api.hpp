@@ -25,22 +25,22 @@
 
 namespace cocoglut
 {
-   
+
 // Constants
 
-enum Constants 
-{  
-   GLUT_LEFT_BUTTON, 
-   GLUT_MIDDLE_BUTTON, 
+enum Constants
+{
+   GLUT_LEFT_BUTTON,
+   GLUT_MIDDLE_BUTTON,
    GLUT_RIGHT_BUTTON,
-   
+
    GLUT_UP,
    GLUT_DOWN,
-   
+
    GLUT_KEY_LEFT,
    GLUT_KEY_UP,
    GLUT_KEY_RIGHT,
-   GLUT_KEY_DOWN        
+   GLUT_KEY_DOWN
 } ;
 
 // Callback function pointer types
@@ -52,6 +52,7 @@ typedef void (* MouseCBPType    ) ( int button, int state, int x, int y );
 typedef void (* ReshapeCBPType  ) ( int width, int height );
 typedef void (* MotionCBPType   ) ( int x, int y ) ;
 typedef void (* IdleCBPType     ) ( void ) ;
+typedef void (* TimerCBPType    ) ( int value );
 
 
 // Window managing and initialization functions
@@ -78,6 +79,7 @@ void glutMouseFunc    ( MouseCBPType    func );
 void glutReshapeFunc  ( ReshapeCBPType  func );
 void glutMotionFunc   ( MotionCBPType   func );
 void glutIdleFunc     ( IdleCBPType     func );
+void glutTimerFunc    ( unsigned int msecs, TimerCBPType func, int value );
 
 
 } // end namespace cocoglut
