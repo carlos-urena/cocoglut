@@ -817,8 +817,15 @@ void LibraryState::idleFunc( IdleCBPType func )
 
 void LibraryState::timerFunc( unsigned int msecs, TimerCBPType func, int value )
 {
-    cerr << "LibraryState::timerFunc not implemented" << endl << flush ;
-    exit(1);
+  logd( "begins: LibraryState::timerFunc"  ) ;
+  checkInit() ;
+
+  // save function pointer, when it is NULL, do nothing more
+  timerCBP = func ;
+  if ( timerCBP == NULL )
+  {  logd( "ends: LibraryState::timerFunc: timer callback function pointer set to NULL." );
+     return ;
+  }
 }
 
 // -----------------------------------------------------------------------------

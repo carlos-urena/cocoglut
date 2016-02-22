@@ -2,3 +2,4 @@ build/*.o
 lib/*.dylib
 lib/*.a
 bin/test1*
+tags
