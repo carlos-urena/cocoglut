@@ -102,6 +102,12 @@ void glutKeyboardFunc( KeyboardCBPType func )
 }
 // ---------------------------------------------------------------------
 
+void glutSpecialFunc( SpecialCBPType func )
+{
+   GetState()->specialFunc( func ) ;
+}
+// ---------------------------------------------------------------------
+
 void glutDisplayFunc( DisplayCBPType func )
 {
    GetState()->displayFunc( func ) ;
@@ -130,6 +136,7 @@ void glutIdleFunc( IdleCBPType func )
 {
     GetState()->idleFunc( func ) ;
 }
+// ---------------------------------------------------------------------
 
 void glutTimerFunc( unsigned int msecs, TimerCBPType func, int value )
 {
