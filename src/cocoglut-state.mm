@@ -111,14 +111,15 @@ WindowState * LibraryState::getCurrentWindowState()
 // ---------------------------------------------------------------------
 // creates a pixel format for an opengl view (before creating the view)
 
-NSOpenGLPixelFormat * LibraryState::createPixelFormat()
+NSOpenGLPixelFormat * LibraryState::createPixelFormat(  )
 {
    // see:
    // http://stackoverflow.com/questions/11602406/opengl-3-2-w-nsopenglview
 
-   NSOpenGLPixelFormatAttribute attrs[] =
+   NSOpenGLPixelFormatAttribute attrs_v1[] =
    {
       NSOpenGLPFADoubleBuffer,
+      NSOpenGLPFADepthSize, 24,
       //NSOpenGLPFASupersample,
       //NSOpenGLPFASampleBuffers, (NSOpenGLPixelFormatAttribute)1,
       //NSOpenGLPFASamples, (NSOpenGLPixelFormatAttribute)4,
@@ -127,11 +128,33 @@ NSOpenGLPixelFormat * LibraryState::createPixelFormat()
       0
    };
 
-   NSOpenGLPixelFormat *pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs] autorelease];
+   NSOpenGLPixelFormatAttribute attrs_v2[] =
+   {
+      NSOpenGLPFAOpenGLProfile,  NSOpenGLProfileVersion3_2Core,
+      0
+   };
+
+   NSOpenGLPixelFormatAttribute * attrs = NULL ;
+
+   switch( idMode )
+   {
+      case CCG_OPENGL_2 :
+         attrs = attrs_v1 ;
+         break ;
+      case CCG_OPENGL_4 :
+         attrs = attrs_v2 ;
+         break ;
+      default:
+         cout << "error: invalid mode for creating opengl context" ;
+         exit(1);
+         break ;
+   }
+
+   NSOpenGLPixelFormat *
+      pf =  [[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs] autorelease ];
 
    if ( pf == NULL )
-   {
-      cout << "cocoglut: error: cannot create required pixel format for the OpenGL view." << endl << flush ;
+   {  cout << "cocoglut: error: cannot create required pixel format for the OpenGL view." << endl << flush ;
       exit(1);
    }
 
@@ -512,7 +535,7 @@ int LibraryState::createWindow( const char *name )
    newWindow.title = [NSString stringWithUTF8String:name] ;
 
    // create the pixel format 'pf' for the view
-   NSOpenGLPixelFormat *pf = createPixelFormat() ;
+   NSOpenGLPixelFormat *pf = createPixelFormat( idMode ) ;
 
    // allocate, configure a new view, link it with the window
    //    the view wants the best resolution, see:
@@ -902,6 +925,14 @@ void LibraryState::motionFunc( MotionCBPType func )
    WindowState * cws = getCurrentWindowState();
    cws->callbacks.motionCBP = func ;
 }
+// ---------------------------------------------------------------------
+
+void LibraryState::initDisplayMode( unsigned int mode )
+{
+   assert( idMode == CCG_OPENGL_2 || idMode == CCG_OPENGL_4 );
+   idMode = mode ;
+}
+
 
 // *********************************************************************
 }  // end namespace cocoglut

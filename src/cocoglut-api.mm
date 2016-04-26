@@ -142,6 +142,13 @@ void glutTimerFunc( unsigned int msecs, TimerCBPType func, int value )
 {
     GetState()->timerFunc( msecs, func, value );
 }
+// ---------------------------------------------------------------------
+
+void glutInitDisplayMode( unsigned int mode )
+{
+    GetState()->initDisplayMode( mode );
+}
+
 
 // *********************************************************************
 

@@ -40,7 +40,10 @@ enum Constants
    GLUT_KEY_LEFT,
    GLUT_KEY_UP,
    GLUT_KEY_RIGHT,
-   GLUT_KEY_DOWN
+   GLUT_KEY_DOWN,
+
+   CCG_OPENGL_2,
+   CCG_OPENGL_4
 } ;
 
 // Callback function pointer types
@@ -63,6 +66,7 @@ int  glutGetWindow          ( void );
 void glutSetWindow          ( int win );
 void glutSwapBuffers        ( void );
 void glutInit               ( int *argcp, char **argv );
+void glutInitDisplayMode    ( unsigned int mode );
 void glutInitWindowSize     ( int width, int height );
 void glutInitWindowPosition ( int x, int y );
 void glutMainLoop           ( void );

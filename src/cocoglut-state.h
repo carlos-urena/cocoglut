@@ -97,6 +97,9 @@ class LibraryState
        nextWinSizeX, // x size
        nextWinSizeY; // y size
 
+   unsigned int idMode ; // init display mode for next opengl context creation
+                         // must be CCG_OPENGL_2 CCG_OPENGL_4
+
    // window state info
    unsigned windowCount;  // total number of created windows
    int      currWinId ;   // identifier of the current window (0 implies there is no current window)
@@ -115,6 +118,7 @@ class LibraryState
    TimerCBPType     timerCBP ;  // timer callback function pointer (NULL when not set)
    NSNotification * idleNotification ; // idle notification object
 
+   //
 
    // ******************************************************************
    // aux methods
@@ -139,7 +143,8 @@ class LibraryState
    WindowState * getCurrentWindowState() ;
 
    // creates a pixel format for an opengl view (must be called before creating the view)
-   NSOpenGLPixelFormat * createPixelFormat() ;
+   // idMode must be: CCG_OPENGL_2 (default) or CCG_OPENGL_4
+   NSOpenGLPixelFormat * createPixelFormat( ) ;
 
    // prints debug state info on 'cout'
    void debugState() ;
@@ -170,6 +175,7 @@ class LibraryState
       idleObsReg       = false ;
       idleCBP          = NULL ;
       timerCBP         = NULL ;
+      idMode           = CCG_OPENGL_2 ;
    }
 
    // ------------------------------------------------------------------
@@ -212,13 +218,11 @@ class LibraryState
    void swapBuffers        ( ) ;
 
    void init               ( int *argcp, char **argv ) ;
+   void initDisplayMode    ( unsigned int mode ) ;
    void initWindowPosition ( int x, int y ) ;
    void initWindowSize     ( int width, int height );
    void mainLoop           ( ) ;
    void postRedisplay      ( ) ;
-
-
-
 
 } ; // end class LibraryState.
 
