@@ -535,7 +535,7 @@ int LibraryState::createWindow( const char *name )
    newWindow.title = [NSString stringWithUTF8String:name] ;
 
    // create the pixel format 'pf' for the view
-   NSOpenGLPixelFormat *pf = createPixelFormat( idMode ) ;
+   NSOpenGLPixelFormat *pf = createPixelFormat( ) ;
 
    // allocate, configure a new view, link it with the window
    //    the view wants the best resolution, see:
