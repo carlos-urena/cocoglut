@@ -345,13 +345,29 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       }
       else  // it must be a click on a button
       {
-         MouseCBPType mouseCBP = cws->callbacks.mouseCBP ;
-         if ( mouseCBP != NULL )
+
+         if ( typeUpDown == GLUT_DOWN &&
+              mouseButton == GLUT_RIGHT_BUTTON )  // cambiar a: si hay regitrado menu
          {
-            // make window the current window and actually invoke callback
-            currWinId = windowId ;
-            mouseCBP( mouseButton, typeUpDown, pos_x, pos_y );
-            handled = true ;
+            static NSMenu *theMenu = NULL ;
+            if ( theMenu == NULL )
+            {
+               theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+               [theMenu insertItemWithTitle:@"Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0];
+               [theMenu insertItemWithTitle:@"Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
+            }
+            [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
+         }
+         else
+         {
+            MouseCBPType mouseCBP = cws->callbacks.mouseCBP ;
+            if ( mouseCBP != NULL )
+            {
+               // make window the current window and actually invoke callback
+               currWinId = windowId ;
+               mouseCBP( mouseButton, typeUpDown, pos_x, pos_y );
+               handled = true ;
+            }
          }
       }
    }

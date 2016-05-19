@@ -2,7 +2,7 @@
 // **
 // ** Implementation for "MyOpenGLView" class
 // **
-// ** 
+// **
 // ** This is a Cocoa custom OpenGl View, see:
 // **   https://developer.apple.com/opengl/
 // **   https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_drawing/opengl_drawing.html#//apple_ref/doc/uid/TP40001987-CH404-SW8
@@ -39,10 +39,10 @@
 // ---------------------------------------------------------------------
 // checks library state pointer (ls) is not null, aborts when it is
 
-- (void) checkLs 
+- (void) checkLs
 {
    using namespace std ;
-   
+
    if ( ls == NULL )
    {
       cout << "cocoglut: error: event received at the view with null library state reference " << endl << flush ;
@@ -69,74 +69,75 @@
 // ---------------------------------------------------------------------
 // handles left mouse down event
 
-- (void)mouseDown:(NSEvent *)theEvent 
+- (void)mouseDown:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
+   if ( ! ls->handleEvent( windowId, theEvent ) )
       [[self nextResponder] mouseDown:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles left mouse up event
 
-- (void)mouseUp:(NSEvent *)theEvent 
+- (void)mouseUp:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent) ) 
-      [[self nextResponder] mouseUp:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent) )
+      [[self nextResponder] mouseUp:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles right mouse down event
 
-- (void)rightMouseDown:(NSEvent *)theEvent 
+- (void)rightMouseDown:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
+
+   if ( ! ls->handleEvent( windowId, theEvent ) )
       [[self nextResponder] rightMouseDown:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles right mouse up event
 
-- (void)rightMouseUp:(NSEvent *)theEvent 
+- (void)rightMouseUp:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent) ) 
-      [[self nextResponder] rightMouseUp:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent) )
+      [[self nextResponder] rightMouseUp:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles other (middle?) mouse down event
 
-- (void)otherMouseDown:(NSEvent *)theEvent 
+- (void)otherMouseDown:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
+   if ( ! ls->handleEvent( windowId, theEvent ) )
       [[self nextResponder] otherMouseDown:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles other (middle?) mouse up event
 
-- (void)otherMouseUp:(NSEvent *)theEvent 
+- (void)otherMouseUp:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent) ) 
-      [[self nextResponder] otherMouseUp:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent) )
+      [[self nextResponder] otherMouseUp:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles key down event
 
-- (void) keyDown:(NSEvent *)theEvent 
+- (void) keyDown:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
-      [[self nextResponder] keyDown:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent ) )
+      [[self nextResponder] keyDown:theEvent];
 }
 // ---------------------------------------------------------------------
 // handles key up event
 
-- (void) keyUp:(NSEvent *)theEvent 
+- (void) keyUp:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
-      [[self nextResponder] keyUp:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent ) )
+      [[self nextResponder] keyUp:theEvent];
 }
 
 // ---------------------------------------------------------------------
@@ -145,8 +146,8 @@
 - (void)mouseDragged:(NSEvent *)theEvent
 {
    [self checkLs] ;
-   if ( ! ls->handleEvent( windowId, theEvent ) ) 
-      [[self nextResponder] mouseDragged:theEvent]; 
+   if ( ! ls->handleEvent( windowId, theEvent ) )
+      [[self nextResponder] mouseDragged:theEvent];
 }
 
 // *********************************************************************
