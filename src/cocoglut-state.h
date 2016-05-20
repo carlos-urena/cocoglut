@@ -149,6 +149,9 @@ class LibraryState
    // prints debug state info on 'cout'
    void debugState() ;
 
+   // test about how to create a menu (in response to an event)
+   void testMenu(NSEvent * event, WindowState * cws);
+
 
    // ******************************************************************
    // public methods

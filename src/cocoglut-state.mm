@@ -242,6 +242,37 @@ void LibraryState::reshape( const int windowId )
 }
 // ---------------------------------------------------------------------
 
+void LibraryState::testMenu(NSEvent * event, WindowState * cws)
+{
+   static NSMenu *theMenu    = NULL ,
+                *theSubMenu = NULL ;
+   if ( theMenu == NULL )
+   {
+      theSubMenu = [[NSMenu alloc] initWithTitle:@"Sub Menu"];
+      [theSubMenu setAutoenablesItems:NO];
+      NSMenuItem
+         * itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
+         * itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
+      [itemSub1 setEnabled:YES];
+      [itemSub2 setEnabled:YES];
+
+      theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+      [theMenu setAutoenablesItems:NO];
+      NSMenuItem
+         * item1 = [theMenu insertItemWithTitle:@"Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
+         * item2 = [theMenu insertItemWithTitle:@"Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1],
+         * item3 = [theMenu insertItemWithTitle:@"Sub" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
+
+      [item3 setSubmenu:theSubMenu];
+      [item1 setEnabled:YES];
+      [item2 setEnabled:YES];
+      [item3 setEnabled:YES];
+
+   }
+   [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
+
+}
+
 bool LibraryState::handleEvent( const int windowId, NSEvent * event )
 {
    logd("LibraryState::handleEvent, window id  == " << windowId ) ;
@@ -349,14 +380,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
          if ( typeUpDown == GLUT_DOWN &&
               mouseButton == GLUT_RIGHT_BUTTON )  // cambiar a: si hay regitrado menu
          {
-            static NSMenu *theMenu = NULL ;
-            if ( theMenu == NULL )
-            {
-               theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-               [theMenu insertItemWithTitle:@"Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0];
-               [theMenu insertItemWithTitle:@"Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
-            }
-            [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
+            testMenu(event,cws);
          }
          else
          {
