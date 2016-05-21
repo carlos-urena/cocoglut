@@ -972,7 +972,62 @@ void LibraryState::initDisplayMode( unsigned int mode )
    assert( idMode == CCG_OPENGL_2 || idMode == CCG_OPENGL_4 );
    idMode = mode ;
 }
+// ---------------------------------------------------------------------
+void LibraryState::createMenu( MenuCBPType func )
+{
 
+}
+// ---------------------------------------------------------------------
+void LibraryState::setMenu( int menu )
+{
+
+}
+// ---------------------------------------------------------------------
+int LibraryState::getMenu( void )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::destroyMenu( int menu )
+{
+
+}
+// ---------------------------------------------------------------------
+
+void LibraryState::addMenuEntry( const char * name, int value )  // added 'const'
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::addSubMenu( const char * name, int menu )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::changeToSubMenu( int entry, const char * name, int value )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::removeMenuItem( int entry )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::attachMenu( int button )
+{
+
+}
+// ---------------------------------------------------------------------
+void LibraryState::dettachMenu( int button )
+{
+
+}
 
 // *********************************************************************
 }  // end namespace cocoglut

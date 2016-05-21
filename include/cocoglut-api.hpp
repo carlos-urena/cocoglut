@@ -56,6 +56,7 @@ typedef void (* ReshapeCBPType  ) ( int width, int height );
 typedef void (* MotionCBPType   ) ( int x, int y ) ;
 typedef void (* IdleCBPType     ) ( void ) ;
 typedef void (* TimerCBPType    ) ( int value );
+typedef void (* MenuCBPType     ) ( int value );
 
 
 // Window managing and initialization functions
@@ -85,6 +86,21 @@ void glutMotionFunc   ( MotionCBPType   func );
 void glutIdleFunc     ( IdleCBPType     func );
 void glutTimerFunc    ( unsigned int msecs, TimerCBPType func, int value );
 
+
+// Menu handling functions
+// https://www.opengl.org/resources/libraries/glut/spec3/node35.html
+
+void glutCreateMenu       ( MenuCBPType func ) ;
+void glutSetMenu          ( int menu ) ;
+int  glutGetMenu          ( void ) ;
+void glutDestroyMenu      ( int menu ) ;
+void glutAddMenuEntry     ( const char * name, int value ) ; // added 'const'
+void glutAddSubMenu       ( const char * name, int menu ) ;
+void glutChangeToMenuEntry( int entry, const char * name, int value ) ;
+void glutChangeToSubMenu  ( int entry, const char * name, int value ) ;
+void glutRemoveMenuItem   ( int entry ) ;
+void glutAttachMenu       ( int button ) ;
+void glutDetachMenu       ( int button ) ;
 
 } // end namespace cocoglut
 

@@ -227,6 +227,21 @@ class LibraryState
    void mainLoop           ( ) ;
    void postRedisplay      ( ) ;
 
+   // -----------------------------------------------------------------
+   // menu functions
+
+   void createMenu       ( MenuCBPType func ) ;
+   void setMenu          ( int menu ) ;
+   int  getMenu          ( void ) ;
+   void destroyMenu      ( int menu ) ;
+   void addMenuEntry     ( const char * name, int value ) ; // added 'const'
+   void addSubMenu       ( const char * name, int menu ) ;
+   void changeToMenuEntry( int entry, const char * name, int value ) ;
+   void changeToSubMenu  ( int entry, const char * name, int value ) ;
+   void removeMenuItem   ( int entry ) ;
+   void attachMenu       ( int button ) ;
+   void dettachMenu      ( int button ) ;
+
 } ; // end class LibraryState.
 
 // *********************************************************************
