@@ -164,7 +164,7 @@ void glutSetMenu( int menu )
 
 int  glutGetMenu( void )
 {
-   GetState()->getMenu();
+   return GetState()->getMenu();
 }
 // ----------------------------------------------------------------------------
 

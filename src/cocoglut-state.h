@@ -33,6 +33,18 @@
 //#define logd( msg )  cout << "cocoglut: debug: " << msg << endl << flush
 #define logd( msg )
 
+// *****************************************************************************
+
+namespace cocoglut
+{
+   class MenuItem ;
+}
+
+@interface ccg_MenuItemWrapper : NSObject
+
+   @property (nonatomic, assign) cocoglut::MenuItem *item;
+
+@end
 
 // *********************************************************************
 
@@ -95,19 +107,29 @@ class Menu
    std::vector<MenuItem *> items ;
    NSMenu *                cocoaMenu ;
 } ;
-// *****************************************************************************
+
+
+// -----------------------------------------------------------------------------
 
 class MenuItem
 {
 public:
 
-   MenuItem( const std::string & p_title, Menu * p_menu );
-   std::string    title ;
-   unsigned       index ;
-   NSMenuItem *   cocoaItem ;
-   Menu *         menu ;
+   MenuItem( const std::string & p_title, Menu * p_parentMenu );
+   MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_subMenu );
+
+   std::string           title ;
+   unsigned              index ;
+   NSMenuItem *          cocoaItem ;
+   Menu *                parentMenu ;
+   ccg_MenuItemWrapper * wrapper ;
+   bool                  isSubMenu ;
+   Menu *                subMenu ;
+
    void clicked();
 } ;
+
+
 
 // *********************************************************************
 // singleton class LibraryState

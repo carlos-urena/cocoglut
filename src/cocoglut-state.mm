@@ -36,6 +36,29 @@
 
 using namespace std ;
 
+// *****************************************************************************
+
+@implementation ccg_MenuItemWrapper
+
+- (id)init: (cocoglut::MenuItem *) p_item
+{
+   self = [super init];
+   if ( self )
+   {
+      _item = p_item ;
+   }
+   return self;
+}
+// -----------------------------------------------------------------------------
+
+- (void) clicked
+{
+   _item->clicked();
+}
+
+@end
+// *****************************************************************************
+
 namespace cocoglut
 {
 
@@ -955,7 +978,7 @@ void LibraryState::setMenu( int menu )
 // ---------------------------------------------------------------------
 int LibraryState::getMenu( void )
 {
-
+   return 0 ;
 }
 // ---------------------------------------------------------------------
 void LibraryState::destroyMenu( int menu )
@@ -1011,7 +1034,7 @@ void LibraryState::menuTestMethod()
 cout << "-- LibraryState::menuTestMethod" << endl << flush ;
 
 }
-
+// ---------------------------------------------------------------------
 
 void LibraryState::testMenu( NSEvent * event, WindowState * cws)
 {
@@ -1055,6 +1078,7 @@ void LibraryState::testMenu( NSEvent * event, WindowState * cws)
    [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
 
 }
+// ---------------------------------------------------------------------
 
 void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
 {
@@ -1065,6 +1089,14 @@ void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
       menu = new Menu() ;
       MenuItem * item1 = new MenuItem("hola", menu),
                * item2 = new MenuItem("adios", menu);
+
+      Menu * subMenu = new Menu();
+
+      MenuItem * sub1 = new MenuItem("sub item 1",subMenu),
+               * sub2 = new MenuItem("sub item 2",subMenu);
+
+      MenuItem * item3 = new MenuItem("sub", menu, subMenu);
+
    }
    [NSMenu popUpContextMenu:menu->cocoaMenu withEvent:event forView:cws->cocoaView ];
 }
@@ -1080,36 +1112,70 @@ Menu::Menu()
 }
 // *****************************************************************************
 
-MenuItem::MenuItem( const std::string & p_title, Menu * p_menu )
+MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu )
 {
-   assert( p_menu != NULL );
-   menu = p_menu ;
-   title = p_title ;
+   assert( p_parentMenu != NULL );
+
+   // initialize instance variables
+   parentMenu = p_parentMenu ;
+   title      = p_title ;
+   isSubMenu  = false ;
+   subMenu    = nullptr ;
 
    // retrieve cocoa menu
-   NSMenu * ccMenu = menu->cocoaMenu ;
-   assert( ccMenu != NULL ); // the cocoa menu must has been created previously
+   NSMenu * ccParentMenu = parentMenu->cocoaMenu ;
+   assert( ccParentMenu != NULL ); // the cocoa menu must has been created previously
 
-   // create and store cocoa item
-   cocoaItem = [ccMenu addItemWithTitle:@"pepe" action:@selector(clicked) keyEquivalent:@"" ] ;
+   // create and store cocoa item (we alloc the title)
+   NSString* nsTitle = [[NSString alloc] initWithUTF8String:title.c_str()];
+   cocoaItem = [ccParentMenu addItemWithTitle:nsTitle action:@selector(clicked) keyEquivalent:@"" ] ;
    assert( cocoaItem != NULL );
 
    // configure the item
    [cocoaItem setEnabled:YES];
-   [cocoaItem setTarget:(id)this];
+
+   // create the wrapper pointing to this object, set it as the target
+   wrapper = [[ccg_MenuItemWrapper alloc]init: this ] ;
+   [cocoaItem setTarget:(id)wrapper];
 
    // add this item to the list of items in the menu
-   index = menu->items.size() ;
-   menu->items.push_back( this );
+   index = parentMenu->items.size() ;
+   parentMenu->items.push_back( this );
+}
+// -----------------------------------------------------------------------------
 
+MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_subMenu )
+{
+   // initialize instance variables
+   parentMenu = p_parentMenu ;
+   title      = p_title ;
+   isSubMenu  = true ;
+   subMenu    = p_subMenu ;
 
+   assert( subMenu != NULL );
+
+   // retrieve cocoa menu
+   NSMenu * ccParentMenu = parentMenu->cocoaMenu ;
+   assert( ccParentMenu != NULL ); // the cocoa menu must has been created previously
+
+   // create and store cocoa item (we alloc the title)
+   NSString* nsTitle = [[NSString alloc] initWithUTF8String:title.c_str()];
+   cocoaItem = [ccParentMenu addItemWithTitle:nsTitle action:@selector(clicked) keyEquivalent:@"" ] ;
+   assert( cocoaItem != NULL );
+
+   // configure the item
+   [cocoaItem setEnabled:YES];
+   [cocoaItem setSubmenu:subMenu->cocoaMenu];
+
+   // add this item to the list of items in the menu
+   index = parentMenu->items.size() ;
+   parentMenu->items.push_back( this );
 }
 // -----------------------------------------------------------------------------
 
 void MenuItem::clicked()
 {
-
-
+   cout << "MenuItem::clicked(), title == " << title << ", index == " << index << endl << flush ;
 }
 
 // *********************************************************************
