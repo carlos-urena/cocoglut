@@ -90,7 +90,7 @@ void glutTimerFunc    ( unsigned int msecs, TimerCBPType func, int value );
 // Menu handling functions
 // https://www.opengl.org/resources/libraries/glut/spec3/node35.html
 
-void glutCreateMenu       ( MenuCBPType func ) ;
+int  glutCreateMenu       ( MenuCBPType func ) ;
 void glutSetMenu          ( int menu ) ;
 int  glutGetMenu          ( void ) ;
 void glutDestroyMenu      ( int menu ) ;

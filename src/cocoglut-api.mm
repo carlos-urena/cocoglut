@@ -150,9 +150,9 @@ void glutInitDisplayMode( unsigned int mode )
 }
 // ----------------------------------------------------------------------------
 
-void glutCreateMenu( MenuCBPType func )
+int glutCreateMenu( MenuCBPType func )
 {
-   GetState()->createMenu( func );
+   return GetState()->createMenu( func );
 }
 // ----------------------------------------------------------------------------
 

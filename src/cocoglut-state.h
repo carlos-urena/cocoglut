@@ -98,24 +98,26 @@ class WindowState
 } ;
 
 // *****************************************************************************
+
 class MenuItem ;
 
 class Menu
 {
    public:
-   Menu();
+
+   Menu( MenuCBPType p_func );
    std::vector<MenuItem *> items ;
    NSMenu *                cocoaMenu ;
+   MenuCBPType             func ;
 } ;
-
 
 // -----------------------------------------------------------------------------
 
 class MenuItem
 {
-public:
+   public:
 
-   MenuItem( const std::string & p_title, Menu * p_parentMenu );
+   MenuItem( const std::string & p_title, const int p_value, Menu * p_parentMenu );
    MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_subMenu );
 
    std::string           title ;
@@ -125,6 +127,7 @@ public:
    ccg_MenuItemWrapper * wrapper ;
    bool                  isSubMenu ;
    Menu *                subMenu ;
+   int                   value ; // value passed to the callback
 
    void clicked();
 } ;
@@ -164,6 +167,10 @@ class LibraryState
    IdleCBPType      idleCBP;    // idle callback funtion pointer (NULL when not set)
    TimerCBPType     timerCBP ;  // timer callback function pointer (NULL when not set)
    NSNotification * idleNotification ; // idle notification object
+
+   // menu handling data
+   std::vector<Menu *> menus ; // list of already created menus
+   int  currentMenuNum ;       // current menu number, initially -1
 
    //
 
@@ -227,6 +234,7 @@ class LibraryState
       idleCBP          = NULL ;
       timerCBP         = NULL ;
       idMode           = CCG_OPENGL_2 ;
+      currentMenuNum   = 0 ;  // (no current menu)
    }
 
    void menuTestMethod();// just for test, called from the view

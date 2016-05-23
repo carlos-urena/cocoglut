@@ -960,36 +960,52 @@ void LibraryState::motionFunc( MotionCBPType func )
 }
 // ---------------------------------------------------------------------
 
-void LibraryState::initDisplayMode( unsigned int mode )
+int LibraryState::initDisplayMode( unsigned int mode )
 {
    assert( idMode == CCG_OPENGL_2 || idMode == CCG_OPENGL_4 );
    idMode = mode ;
 }
 // ---------------------------------------------------------------------
-void LibraryState::createMenu( MenuCBPType func )
+int LibraryState::createMenu( MenuCBPType func )
 {
-
+   Menu * menu = new Menu(func);
+   assert( menu->number > 0 );
+   currentMenuNum = menu->number ;
+   return currentMenuNum ;
 }
 // ---------------------------------------------------------------------
 void LibraryState::setMenu( int menu )
 {
-
+   assert( menu > 0);
+   assert( menu <= menus.size() );
+   assert( menus[menu-1] != nullptr );
+   currentMenuNum = menu ;
 }
 // ---------------------------------------------------------------------
 int LibraryState::getMenu( void )
 {
-   return 0 ;
+   return currentMenuNum ;
 }
 // ---------------------------------------------------------------------
 void LibraryState::destroyMenu( int menu )
 {
-
+   assert( menu > 0);
+   assert( menu <= menus.size() );
+   assert( menus[menu-1] != nullptr );
+   delete menu[menu-1];
+   menu[menu-1] = nullptr ;
+   if ( currentMenuNum == menu )
+      currentMenuNum = 0 ;
 }
 // ---------------------------------------------------------------------
 
 void LibraryState::addMenuEntry( const char * name, int value )  // added 'const'
 {
-
+   assert( 0 < currentMenu );
+   Menu * pm = menus[currentMenu-1] ;
+   assert( pm != nullptr );
+   MenuItem * item = new MenuItem( new std::string(name), value, pm );
+   pm->items.push_back( item );
 }
 // ---------------------------------------------------------------------
 void LibraryState::addSubMenu( const char * name, int menu )
@@ -1103,16 +1119,27 @@ void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
 
 // *****************************************************************************
 
-Menu::Menu()
+Menu::Menu( MenuCBPType p_func )
 {
-   cocoaMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-   assert(cocoaMenu != NULL);
-   [cocoaMenu setAutoenablesItems:NO];
+   // store function pointer
+   assert( p_func != nullptr );
+   func = p_func ;
 
+   // create and configure the cocoa menu
+   cocoaMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+   assert( cocoaMenu != NULL );
+   [cocoaMenu setAutoenablesItems:NO ];
+
+   // menu number is equal to the total number of menus already created
+   static int counter = 0 ;
+   number = ++counter ;
+
+   // link 'this' menu in the menu vector
+   GetState()->menus.push_back( this );
 }
 // *****************************************************************************
 
-MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu )
+MenuItem::MenuItem( const std::string & p_title, const int p_value, Menu * p_parentMenu )
 {
    assert( p_parentMenu != NULL );
 
@@ -1121,6 +1148,7 @@ MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu )
    title      = p_title ;
    isSubMenu  = false ;
    subMenu    = nullptr ;
+   value      = p_value ;
 
    // retrieve cocoa menu
    NSMenu * ccParentMenu = parentMenu->cocoaMenu ;
@@ -1151,6 +1179,7 @@ MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_
    title      = p_title ;
    isSubMenu  = true ;
    subMenu    = p_subMenu ;
+
 
    assert( subMenu != NULL );
 
