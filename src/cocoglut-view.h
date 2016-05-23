@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-namespace cocoglut { class LibraryState ; } 
+namespace cocoglut { class LibraryState ; }
 
 // *********************************************************************
 // custom opengl cocoa view class
@@ -32,7 +32,7 @@ namespace cocoglut { class LibraryState ; }
 // https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_drawing/opengl_drawing.html#//apple_ref/doc/uid/TP40001987-CH404-SW8
 
 @interface ccg_OpenGLView : NSOpenGLView
-   
+
    {
       @public unsigned windowId ;            // 'LibraryState' window id for the window this view is in.
       @public cocoglut::LibraryState * ls ;  // link to the library state singleton object
@@ -49,11 +49,12 @@ namespace cocoglut { class LibraryState ; }
    - (void) mouseUp:        (NSEvent *)theEvent ;
    - (void) rightMouseDown: (NSEvent *)theEvent ;
    - (void) rightMouseUp:   (NSEvent *)theEvent ;
-   - (void) otherMouseDown: (NSEvent *)theEvent ;  
+   - (void) otherMouseDown: (NSEvent *)theEvent ;
    - (void) otherMouseUp:   (NSEvent *)theEvent ;
    - (void) keyDown:        (NSEvent *)theEvent ;
    - (void) keyUp:          (NSEvent *)theEvent ;
    - (void) mouseDragged:   (NSEvent *)theEvent ;
+   - (void) menuTestMethod ;
 
 
 @end

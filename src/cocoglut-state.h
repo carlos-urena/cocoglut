@@ -23,6 +23,7 @@
 #define COCOGLUT_STATE_H
 
 #include <vector>
+#include <string>
 #include <cocoglut-api.hpp>
 
 #import <Cocoa/Cocoa.h>
@@ -82,6 +83,30 @@ class WindowState
       id          = 0 ;
       isClosed    = false ;
    }
+} ;
+
+// *****************************************************************************
+class MenuItem ;
+
+class Menu
+{
+   public:
+   Menu();
+   std::vector<MenuItem *> items ;
+   NSMenu *                cocoaMenu ;
+} ;
+// *****************************************************************************
+
+class MenuItem
+{
+public:
+
+   MenuItem( const std::string & p_title, Menu * p_menu );
+   std::string    title ;
+   unsigned       index ;
+   NSMenuItem *   cocoaItem ;
+   Menu *         menu ;
+   void clicked();
 } ;
 
 // *********************************************************************
@@ -151,6 +176,7 @@ class LibraryState
 
    // test about how to create a menu (in response to an event)
    void testMenu(NSEvent * event, WindowState * cws);
+   void testMenu2(NSEvent * event, WindowState * cws);
 
 
    // ******************************************************************
@@ -180,6 +206,8 @@ class LibraryState
       timerCBP         = NULL ;
       idMode           = CCG_OPENGL_2 ;
    }
+
+   void menuTestMethod();// just for test, called from the view
 
    // ------------------------------------------------------------------
    // methods called from one of the opengl views or window delegate, when

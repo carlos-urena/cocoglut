@@ -242,36 +242,6 @@ void LibraryState::reshape( const int windowId )
 }
 // ---------------------------------------------------------------------
 
-void LibraryState::testMenu(NSEvent * event, WindowState * cws)
-{
-   static NSMenu *theMenu    = NULL ,
-                *theSubMenu = NULL ;
-   if ( theMenu == NULL )
-   {
-      theSubMenu = [[NSMenu alloc] initWithTitle:@"Sub Menu"];
-      [theSubMenu setAutoenablesItems:NO];
-      NSMenuItem
-         * itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
-         * itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
-      [itemSub1 setEnabled:YES];
-      [itemSub2 setEnabled:YES];
-
-      theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-      [theMenu setAutoenablesItems:NO];
-      NSMenuItem
-         * item1 = [theMenu insertItemWithTitle:@"Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
-         * item2 = [theMenu insertItemWithTitle:@"Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1],
-         * item3 = [theMenu insertItemWithTitle:@"Sub" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
-
-      [item3 setSubmenu:theSubMenu];
-      [item1 setEnabled:YES];
-      [item2 setEnabled:YES];
-      [item3 setEnabled:YES];
-
-   }
-   [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
-
-}
 
 bool LibraryState::handleEvent( const int windowId, NSEvent * event )
 {
@@ -380,7 +350,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
          if ( typeUpDown == GLUT_DOWN &&
               mouseButton == GLUT_RIGHT_BUTTON )  // cambiar a: si hay regitrado menu
          {
-            testMenu(event,cws);
+            testMenu2(event,cws);
          }
          else
          {
@@ -1026,6 +996,119 @@ void LibraryState::attachMenu( int button )
 // ---------------------------------------------------------------------
 void LibraryState::dettachMenu( int button )
 {
+
+}
+
+// ********
+
+void testMenuFunc( int value )
+{
+   cout << "testMenuFunc, value == " << value << endl << flush ;
+}
+
+void LibraryState::menuTestMethod()
+{
+cout << "-- LibraryState::menuTestMethod" << endl << flush ;
+
+}
+
+
+void LibraryState::testMenu( NSEvent * event, WindowState * cws)
+{
+   static NSMenu *theMenu    = NULL ,
+                *theSubMenu = NULL ;
+
+   MenuCBPType funcPtr ;
+
+   funcPtr = testMenuFunc;
+
+   if ( theMenu == NULL )
+   {
+      theSubMenu = [[NSMenu alloc] initWithTitle:@"Sub Menu"];
+      [theSubMenu setAutoenablesItems:NO];
+      NSMenuItem
+         //* itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
+         //* itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
+         * itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(funcPtr) keyEquivalent:@"" atIndex:0],
+         * itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(funcPtr) keyEquivalent:@"" atIndex:1];
+      [itemSub1 setEnabled:YES];
+      [itemSub2 setEnabled:YES];
+
+      theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+      [theMenu setAutoenablesItems:NO];
+      NSMenuItem
+         * item1 = [theMenu addItemWithTitle:@"Beep" action:@selector(menuTestMethod) keyEquivalent:@"" ],
+         * item2 = [theMenu addItemWithTitle:@"Honk" action:@selector(funcPtr) keyEquivalent:@"" ],
+         * item3 = [theMenu addItemWithTitle:@"Sub" action:@selector(funcPtr) keyEquivalent:@""  ];
+
+      [item3 setSubmenu:theSubMenu];
+
+      ccg_OpenGLView * cwsView = cws->cocoaView;
+
+      [item1 setTarget:cwsView];
+      [item1 setEnabled:YES];
+
+      [item2 setEnabled:YES];
+      [item3 setEnabled:YES];
+
+   }
+   [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
+
+}
+
+void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
+{
+   static Menu * menu = NULL ;
+
+   if ( menu == NULL )
+   {
+      menu = new Menu() ;
+      MenuItem * item1 = new MenuItem("hola", menu),
+               * item2 = new MenuItem("adios", menu);
+   }
+   [NSMenu popUpContextMenu:menu->cocoaMenu withEvent:event forView:cws->cocoaView ];
+}
+
+// *****************************************************************************
+
+Menu::Menu()
+{
+   cocoaMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+   assert(cocoaMenu != NULL);
+   [cocoaMenu setAutoenablesItems:NO];
+
+}
+// *****************************************************************************
+
+MenuItem::MenuItem( const std::string & p_title, Menu * p_menu )
+{
+   assert( p_menu != NULL );
+   menu = p_menu ;
+   title = p_title ;
+
+   // retrieve cocoa menu
+   NSMenu * ccMenu = menu->cocoaMenu ;
+   assert( ccMenu != NULL ); // the cocoa menu must has been created previously
+
+   // create and store cocoa item
+   cocoaItem = [ccMenu addItemWithTitle:@"pepe" action:@selector(clicked) keyEquivalent:@"" ] ;
+   assert( cocoaItem != NULL );
+
+   // configure the item
+   [cocoaItem setEnabled:YES];
+   [cocoaItem setTarget:(id)this];
+
+   // add this item to the list of items in the menu
+   index = menu->items.size() ;
+   menu->items.push_back( this );
+
+
+}
+// -----------------------------------------------------------------------------
+
+void MenuItem::clicked()
+{
+
 
 }
 

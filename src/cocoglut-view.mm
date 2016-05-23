@@ -152,5 +152,14 @@
 
 // *********************************************************************
 
+- (void) menuTestMethod
+{
+
+   [self checkLs] ;
+   ls->menuTestMethod();
+}
+
+
+
 
 @end  // @implementation MyOpenGLView.
