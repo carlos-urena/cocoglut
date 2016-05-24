@@ -381,6 +381,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
             assert( menuNum <= menus.size());
             Menu * menu = menus[menuNum-1] ;
             assert( menu != nullptr );   // may be the menu is destroyed ....????
+            currWinId = windowId ; // is this in the standard ? (it is neccesary)
             [NSMenu popUpContextMenu:menu->cocoaMenu withEvent:event forView:cws->cocoaView ];
             handled = true ;
          }
@@ -1282,7 +1283,10 @@ void MenuItem::clicked()
    //cout << "MenuItem::clicked(), title == " << title << ", index == " << index << endl << flush ;
    assert( parentMenu != NULL );
    if ( parentMenu->func != nullptr )
+   {
+      GetState()->setMenu( parentMenu->number ); // see the standard (glutCreateMenu)
       parentMenu->func( value );
+   }
 }
 
 // *********************************************************************
