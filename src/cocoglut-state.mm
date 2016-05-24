@@ -369,13 +369,22 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       }
       else  // it must be a click on a button
       {
-
-         if ( typeUpDown == GLUT_DOWN &&
-              mouseButton == GLUT_RIGHT_BUTTON )  // cambiar a: si hay regitrado menu
-         {
-            testMenu2(event,cws);
+         int  menuNum = 0 ;
+         if ( typeUpDown == GLUT_DOWN ) // check if a menu must be shown
+         {  if ( mouseButton == GLUT_LEFT_BUTTON )
+               menuNum = cws->leftMenuNum ;
+            else if ( mouseButton == GLUT_RIGHT_BUTTON )
+               menuNum = cws->rightMenuNum ;
          }
-         else
+         if ( 0 < menuNum )  // there is a menu attached: show it
+         {
+            assert( menuNum <= menus.size());
+            Menu * menu = menus[menuNum-1] ;
+            assert( menu != nullptr );   // may be the menu is destroyed ....????
+            [NSMenu popUpContextMenu:menu->cocoaMenu withEvent:event forView:cws->cocoaView ];
+            handled = true ;
+         }
+         else // no menu: process click
          {
             MouseCBPType mouseCBP = cws->callbacks.mouseCBP ;
             if ( mouseCBP != NULL )
@@ -707,8 +716,7 @@ void LibraryState::setWindow( int win )
    }
    currWinId = win ;
 }
-
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void LibraryState::swapBuffers( )
 {
@@ -723,8 +731,14 @@ void LibraryState::swapBuffers( )
    glSwapAPPLE() ;
 
 }
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------
+void LibraryState::addToMenus( Menu * menu )
+{
+   assert( menu != nullptr );
+   menus.push_back( menu );
+}
+// -----------------------------------------------------------------------------
 
 void LibraryState::init( int *argcp, char **argv )
 {
@@ -960,7 +974,7 @@ void LibraryState::motionFunc( MotionCBPType func )
 }
 // ---------------------------------------------------------------------
 
-int LibraryState::initDisplayMode( unsigned int mode )
+void LibraryState::initDisplayMode( unsigned int mode )
 {
    assert( idMode == CCG_OPENGL_2 || idMode == CCG_OPENGL_4 );
    idMode = mode ;
@@ -992,8 +1006,9 @@ void LibraryState::destroyMenu( int menu )
    assert( menu > 0);
    assert( menu <= menus.size() );
    assert( menus[menu-1] != nullptr );
-   delete menu[menu-1];
-   menu[menu-1] = nullptr ;
+
+   delete menus[menu-1];
+   menus[menu-1] = nullptr ;
    if ( currentMenuNum == menu )
       currentMenuNum = 0 ;
 }
@@ -1001,16 +1016,41 @@ void LibraryState::destroyMenu( int menu )
 
 void LibraryState::addMenuEntry( const char * name, int value )  // added 'const'
 {
-   assert( 0 < currentMenu );
-   Menu * pm = menus[currentMenu-1] ;
-   assert( pm != nullptr );
-   MenuItem * item = new MenuItem( new std::string(name), value, pm );
-   pm->items.push_back( item );
+   assert( 0 < currentMenuNum );
+   assert( currentMenuNum <= menus.size() );
+
+   // get pointer to current menu
+   Menu * currMenu = menus[currentMenuNum-1] ;
+   assert( currMenu != nullptr );
+
+   // create menu item and add it to current menu
+   std::string title = std::string(name);
+   MenuItem * item = new MenuItem( title, value, currMenu );
+   currMenu->items.push_back( item );
 }
 // ---------------------------------------------------------------------
 void LibraryState::addSubMenu( const char * name, int menu )
 {
+   assert( 0 < currentMenuNum );
+   assert( currentMenuNum <= menus.size() );
 
+   assert( 0 < menu );
+   assert( menu <= menus.size() );
+
+   assert( currentMenuNum != menu ); // avoid loops
+
+   // get pointer to current menu
+   Menu * currMenu = menus[currentMenuNum-1] ;
+   assert( currMenu != nullptr );
+
+   // get pointer to submenu
+   Menu * subMenu = menus[menu-1];
+   assert( subMenu != nullptr );
+
+  // create menu item and add it to current menu
+  std::string title = std::string(name);
+  MenuItem * item = new MenuItem( title, currMenu, subMenu );
+  currMenu->items.push_back( item );
 }
 // ---------------------------------------------------------------------
 void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
@@ -1030,15 +1070,50 @@ void LibraryState::removeMenuItem( int entry )
 // ---------------------------------------------------------------------
 void LibraryState::attachMenu( int button )
 {
+   // check button
+   assert( button == GLUT_LEFT_BUTTON || button == GLUT_RIGHT_BUTTON );
 
+   // check current menu
+   assert( 0 < currentMenuNum );
+   assert( currentMenuNum <= menus.size() );
+   assert( menus[currentMenuNum-1] != nullptr );
+
+   // check current window, and get state
+   WindowState * cws = getCurrentWindowState();
+
+   // link menu to window state
+   switch( button )
+   {
+      case GLUT_LEFT_BUTTON :
+         cws->leftMenuNum = currentMenuNum ;
+         break ;
+      case GLUT_RIGHT_BUTTON :
+         cws->rightMenuNum = currentMenuNum ;
+         break ;
+   }
 }
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 void LibraryState::dettachMenu( int button )
 {
+   // check button
+   assert( button == GLUT_LEFT_BUTTON || button == GLUT_RIGHT_BUTTON );
 
+   // check current window, and get state
+   WindowState * cws = getCurrentWindowState();
+
+   // un-link menu from window state
+   switch( button )
+   {
+      case GLUT_LEFT_BUTTON :
+         cws->leftMenuNum = 0 ;
+         break ;
+      case GLUT_RIGHT_BUTTON :
+         cws->rightMenuNum = 0 ;
+         break ;
+   }
 }
 
-// ********
+// *****************************************************************************
 
 void testMenuFunc( int value )
 {
@@ -1102,14 +1177,14 @@ void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
 
    if ( menu == NULL )
    {
-      menu = new Menu() ;
-      MenuItem * item1 = new MenuItem("hola", menu),
-               * item2 = new MenuItem("adios", menu);
+      menu = new Menu(testMenuFunc) ;
+      MenuItem * item1 = new MenuItem("hola", 1, menu),
+               * item2 = new MenuItem("adios", 2, menu);
 
-      Menu * subMenu = new Menu();
+      Menu * subMenu = new Menu(testMenuFunc);
 
-      MenuItem * sub1 = new MenuItem("sub item 1",subMenu),
-               * sub2 = new MenuItem("sub item 2",subMenu);
+      MenuItem * sub1 = new MenuItem("sub item 1",3, subMenu),
+               * sub2 = new MenuItem("sub item 2",4, subMenu);
 
       MenuItem * item3 = new MenuItem("sub", menu, subMenu);
 
@@ -1135,7 +1210,7 @@ Menu::Menu( MenuCBPType p_func )
    number = ++counter ;
 
    // link 'this' menu in the menu vector
-   GetState()->menus.push_back( this );
+   GetState()->addToMenus( this );
 }
 // *****************************************************************************
 
@@ -1204,7 +1279,10 @@ MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_
 
 void MenuItem::clicked()
 {
-   cout << "MenuItem::clicked(), title == " << title << ", index == " << index << endl << flush ;
+   //cout << "MenuItem::clicked(), title == " << title << ", index == " << index << endl << flush ;
+   assert( parentMenu != NULL );
+   if ( parentMenu->func != nullptr )
+      parentMenu->func( value );
 }
 
 // *********************************************************************

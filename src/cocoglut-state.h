@@ -87,13 +87,17 @@ class WindowState
    int                 id ;          // window id (1 plus its position in window state vector)
    WinCallbackPointers callbacks ;   // set of callback pointers for this window
    bool                isClosed ;    // true if the window has been already closed
+   int                 leftMenuNum,  // number of the menu attached to the left mouse button, 0 if none
+                       rightMenuNum ;// number of the menu attached to the right mouse button, 0 if none
 
    WindowState()
    {
-      cocoaWindow = NULL ;
-      cocoaView   = NULL ;
-      id          = 0 ;
-      isClosed    = false ;
+      cocoaWindow  = NULL ;
+      cocoaView    = NULL ;
+      id           = 0 ;
+      isClosed     = false ;
+      leftMenuNum  = 0 ;
+      rightMenuNum = 0 ;
    }
 } ;
 
@@ -109,6 +113,7 @@ class Menu
    std::vector<MenuItem *> items ;
    NSMenu *                cocoaMenu ;
    MenuCBPType             func ;
+   int                     number ; // unique menu id
 } ;
 
 // -----------------------------------------------------------------------------
@@ -169,10 +174,9 @@ class LibraryState
    NSNotification * idleNotification ; // idle notification object
 
    // menu handling data
-   std::vector<Menu *> menus ; // list of already created menus
-   int  currentMenuNum ;       // current menu number, initially -1
+   std::vector<Menu *> menus ;  // list of already created menus
+   int  currentMenuNum ;        // current menu number, initially -1
 
-   //
 
    // ******************************************************************
    // aux methods
@@ -235,9 +239,11 @@ class LibraryState
       timerCBP         = NULL ;
       idMode           = CCG_OPENGL_2 ;
       currentMenuNum   = 0 ;  // (no current menu)
+
    }
 
    void menuTestMethod();// just for test, called from the view
+   void addToMenus( Menu * menu ); // adds this menu to the 'menus' vector, at the end
 
    // ------------------------------------------------------------------
    // methods called from one of the opengl views or window delegate, when
@@ -288,7 +294,7 @@ class LibraryState
    // -----------------------------------------------------------------
    // menu functions
 
-   void createMenu       ( MenuCBPType func ) ;
+   int  createMenu       ( MenuCBPType func ) ;
    void setMenu          ( int menu ) ;
    int  getMenu          ( void ) ;
    void destroyMenu      ( int menu ) ;
