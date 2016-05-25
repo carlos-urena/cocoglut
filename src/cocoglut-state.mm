@@ -1027,7 +1027,6 @@ void LibraryState::addMenuEntry( const char * name, int value )  // added 'const
    // create menu item and add it to current menu
    std::string title = std::string(name);
    MenuItem * item = new MenuItem( title, value, currMenu );
-   currMenu->items.push_back( item );
 }
 // ---------------------------------------------------------------------
 void LibraryState::addSubMenu( const char * name, int menu )
@@ -1056,7 +1055,27 @@ void LibraryState::addSubMenu( const char * name, int menu )
 // ---------------------------------------------------------------------
 void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
 {
+   // ensure a valid current menu exists
+   assert( 0 < currentMenuNum );
+   assert( currentMenuNum <= menus.size() );
 
+   // get pointer to current menu, check it is valid
+   Menu * currMenu = menus[currentMenuNum-1] ;
+   assert( currMenu != nullptr );
+
+   // check 'entry' value
+   assert( 0 < entry );
+   assert( entry <= currMenu->items.size() );
+
+   // get menu item and cocoa menu item pointers
+   MenuItem * item = currMenu->items[entry-1] ;
+   assert( item != nullptr );
+   NSMenuItem * ccItem = item->cocoaItem ;
+
+   // update item
+   item->value = value ;
+   NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
+   [ccItem setTitle:nsTitle];
 }
 // ---------------------------------------------------------------------
 void LibraryState::changeToSubMenu( int entry, const char * name, int value )
@@ -1243,8 +1262,10 @@ MenuItem::MenuItem( const std::string & p_title, const int p_value, Menu * p_par
    [cocoaItem setTarget:(id)wrapper];
 
    // add this item to the list of items in the menu
-   index = parentMenu->items.size() ;
+   index = parentMenu->items.size()+1 ;
+
    parentMenu->items.push_back( this );
+   cout << "added menu item: " << title << ", index == " << index << endl << flush ;
 }
 // -----------------------------------------------------------------------------
 
@@ -1273,7 +1294,7 @@ MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_
    [cocoaItem setSubmenu:subMenu->cocoaMenu];
 
    // add this item to the list of items in the menu
-   index = parentMenu->items.size() ;
+   index = parentMenu->items.size()+1 ;
    parentMenu->items.push_back( this );
 }
 // -----------------------------------------------------------------------------
