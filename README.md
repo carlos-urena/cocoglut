@@ -27,6 +27,15 @@ The current (December 2015) solution provided by Apple is an implementation for 
     void glutMotionFunc   ( MotionCBPType   func );
     void glutIdleFunc     ( IdleCBPType     func );
 
+    int  glutCreateMenu   ( MenuCBPType func ) ;
+    void glutSetMenu      ( int menu ) ;
+    int  glutGetMenu      ( void ) ;
+    void glutDestroyMenu  ( int menu ) ;
+    void glutAddMenuEntry ( const char * name, int value ) ; // added 'const'
+    void glutAddSubMenu   ( const char * name, int menu ) ;
+    void glutAttachMenu   ( int button ) ;
+    void glutDetachMenu   ( int button ) ;
+
 Callback function pointer types are defined as follows:
 
     typedef void (* KeyboardCBPType ) ( unsigned char key, int x, int y ) ;
