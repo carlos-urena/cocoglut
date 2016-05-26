@@ -1072,13 +1072,22 @@ void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
    assert( item != nullptr );
    NSMenuItem * ccItem = item->cocoaItem ;
 
-   // update item
-   item->value = value ;
-   NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
-   [ccItem setTitle:nsTitle];
+
+   if ( item->isSubMenu )
+   {
+      // it was a submenu.... remove it and create a new item entry
+      jgjgj  jjnjfgjjh
+   }
+   else
+   {
+      // it was already a menu item: just change the title and the value
+      item->value = value ;
+      NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
+      [ccItem setTitle:nsTitle];
+   }
 }
 // ---------------------------------------------------------------------
-void LibraryState::changeToSubMenu( int entry, const char * name, int value )
+void LibraryState::changeToSubMenu( int entry, const char * name, int menu )
 {
 
 }
@@ -1131,85 +1140,6 @@ void LibraryState::dettachMenu( int button )
          cws->rightMenuNum = 0 ;
          break ;
    }
-}
-
-// *****************************************************************************
-
-void testMenuFunc( int value )
-{
-   cout << "testMenuFunc, value == " << value << endl << flush ;
-}
-
-void LibraryState::menuTestMethod()
-{
-cout << "-- LibraryState::menuTestMethod" << endl << flush ;
-
-}
-// ---------------------------------------------------------------------
-
-void LibraryState::testMenu( NSEvent * event, WindowState * cws)
-{
-   static NSMenu *theMenu    = NULL ,
-                *theSubMenu = NULL ;
-
-   MenuCBPType funcPtr ;
-
-   funcPtr = testMenuFunc;
-
-   if ( theMenu == NULL )
-   {
-      theSubMenu = [[NSMenu alloc] initWithTitle:@"Sub Menu"];
-      [theSubMenu setAutoenablesItems:NO];
-      NSMenuItem
-         //* itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(beep:) keyEquivalent:@"" atIndex:0],
-         //* itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(honk:) keyEquivalent:@"" atIndex:1];
-         * itemSub1 = [theSubMenu insertItemWithTitle:@"Sub Beep" action:@selector(funcPtr) keyEquivalent:@"" atIndex:0],
-         * itemSub2 = [theSubMenu insertItemWithTitle:@"Sub Honk" action:@selector(funcPtr) keyEquivalent:@"" atIndex:1];
-      [itemSub1 setEnabled:YES];
-      [itemSub2 setEnabled:YES];
-
-      theMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-      [theMenu setAutoenablesItems:NO];
-      NSMenuItem
-         * item1 = [theMenu addItemWithTitle:@"Beep" action:@selector(menuTestMethod) keyEquivalent:@"" ],
-         * item2 = [theMenu addItemWithTitle:@"Honk" action:@selector(funcPtr) keyEquivalent:@"" ],
-         * item3 = [theMenu addItemWithTitle:@"Sub" action:@selector(funcPtr) keyEquivalent:@""  ];
-
-      [item3 setSubmenu:theSubMenu];
-
-      ccg_OpenGLView * cwsView = cws->cocoaView;
-
-      [item1 setTarget:cwsView];
-      [item1 setEnabled:YES];
-
-      [item2 setEnabled:YES];
-      [item3 setEnabled:YES];
-
-   }
-   [NSMenu popUpContextMenu:theMenu withEvent:event forView:cws->cocoaView ];
-
-}
-// ---------------------------------------------------------------------
-
-void LibraryState::testMenu2( NSEvent * event, WindowState * cws )
-{
-   static Menu * menu = NULL ;
-
-   if ( menu == NULL )
-   {
-      menu = new Menu(testMenuFunc) ;
-      MenuItem * item1 = new MenuItem("hola", 1, menu),
-               * item2 = new MenuItem("adios", 2, menu);
-
-      Menu * subMenu = new Menu(testMenuFunc);
-
-      MenuItem * sub1 = new MenuItem("sub item 1",3, subMenu),
-               * sub2 = new MenuItem("sub item 2",4, subMenu);
-
-      MenuItem * item3 = new MenuItem("sub", menu, subMenu);
-
-   }
-   [NSMenu popUpContextMenu:menu->cocoaMenu withEvent:event forView:cws->cocoaView ];
 }
 
 // *****************************************************************************
