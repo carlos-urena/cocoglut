@@ -1072,19 +1072,17 @@ void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
    assert( item != nullptr );
    NSMenuItem * ccItem = item->cocoaItem ;
 
-
    if ( item->isSubMenu )
    {
-      // it was a submenu.... remove it and create a new item entry
-      jgjgj  jjnjfgjjh
+      // it was a submenu.... set it to null ?
+      item->isSubMenu = false ;
+      item->subMenu   = nullptr ;
+      [ccItem setSubmenu: NULL] ;   // works ?
    }
-   else
-   {
-      // it was already a menu item: just change the title and the value
-      item->value = value ;
-      NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
-      [ccItem setTitle:nsTitle];
-   }
+   // update value and title
+   item->value = value ;
+   NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
+   [ccItem setTitle:nsTitle];
 }
 // ---------------------------------------------------------------------
 void LibraryState::changeToSubMenu( int entry, const char * name, int menu )

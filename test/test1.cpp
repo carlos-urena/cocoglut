@@ -235,7 +235,11 @@ int main( int argc, char * argv[] )
    glutAddSubMenu  (" m1 -item 4- sub",subm);
    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
-   glutChangeToMenuEntry( 2, "m2 -item 2, modificado", 3 );
+   glutChangeToMenuEntry( 2, " m1 -item 2, modificado", 2 );
+   glutChangeToMenuEntry( 4, " m1 -item 4, sub quitado", 4 );
+
+
+
 
    glutInitWindowPosition( 200, 200 );
    win2 = glutCreateWindow("cocoglut ventana 2");

@@ -54,8 +54,6 @@ namespace cocoglut { class LibraryState ; }
    - (void) keyDown:        (NSEvent *)theEvent ;
    - (void) keyUp:          (NSEvent *)theEvent ;
    - (void) mouseDragged:   (NSEvent *)theEvent ;
-   - (void) menuTestMethod ;
-
 
 @end
 
