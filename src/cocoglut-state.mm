@@ -1060,24 +1060,22 @@ void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
    assert( currentMenuNum <= menus.size() );
 
    // get pointer to current menu, check it is valid
-   Menu * currMenu = menus[currentMenuNum-1] ;
-   assert( currMenu != nullptr );
+   Menu * currMenu = menus[currentMenuNum-1] ; assert( currMenu != nullptr );
 
    // check 'entry' value
    assert( 0 < entry );
    assert( entry <= currMenu->items.size() );
 
    // get menu item and cocoa menu item pointers
-   MenuItem * item = currMenu->items[entry-1] ;
-   assert( item != nullptr );
-   NSMenuItem * ccItem = item->cocoaItem ;
+   MenuItem *   item   = currMenu->items[entry-1] ; assert( item != nullptr );
+   NSMenuItem * ccItem = item->cocoaItem ;          assert( ccItem != nullptr );
 
    if ( item->isSubMenu )
    {
-      // it was a submenu.... set it to null ?
+      // it was a submenu.... set it to null
       item->isSubMenu = false ;
       item->subMenu   = nullptr ;
-      [ccItem setSubmenu: NULL] ;   // works ?
+      [ccItem setSubmenu: NULL] ;
    }
    // update value and title
    item->value = value ;
@@ -1087,6 +1085,36 @@ void LibraryState::changeToMenuEntry( int entry, const char * name, int value )
 // ---------------------------------------------------------------------
 void LibraryState::changeToSubMenu( int entry, const char * name, int menu )
 {
+   // ensure a valid current menu exists
+   assert( 0 < currentMenuNum );
+   assert( currentMenuNum <= menus.size() );
+
+   // get pointer to current menu, check it is valid
+   Menu * currMenu = menus[currentMenuNum-1] ; assert( currMenu != nullptr );
+
+   // check 'entry' value
+   assert( 0 < entry );
+   assert( entry <= currMenu->items.size() );
+
+   // get menu item and cocoa menu item pointers
+   MenuItem *   item   = currMenu->items[entry-1] ; assert( item != nullptr );
+   NSMenuItem * ccItem = item->cocoaItem ;          assert( ccItem != nullptr );
+
+   // check sub menu number
+   assert( menu != currentMenuNum );
+   assert( 0 < menu );
+   assert( menu <= menus.size() );
+
+   // retrieve and check pointer to submenu and to cocoa submenu
+   Menu *    subMenu   = menus[menu-1];        assert( subMenu != nullptr );
+   NSMenu *  ccSubMenu = subMenu->cocoaMenu ;  assert( ccSubMenu != nullptr );
+
+   // update entry
+   item->isSubMenu = true ;
+   item->subMenu   = subMenu ;
+   NSString* nsTitle = [[NSString alloc] initWithUTF8String:name];
+   [ccItem setTitle:nsTitle];      // entry title
+   [ccItem setSubmenu:ccSubMenu];  // entry sub-menu
 
 }
 // ---------------------------------------------------------------------

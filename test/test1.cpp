@@ -223,7 +223,7 @@ int main( int argc, char * argv[] )
    glutReshapeFunc( Reshape );
    glutMotionFunc( Motion );
 
-   int subm = glutCreateMenu( menuFunc1 );
+   int subm1 = glutCreateMenu( menuFunc1 );
    glutAddMenuEntry("m1 submenu 1",11);
    glutAddMenuEntry("m1 submenu 2",12);
    glutAddMenuEntry("m1 submenu 3",13);
@@ -232,14 +232,19 @@ int main( int argc, char * argv[] )
    glutAddMenuEntry(" m1 -item 1",1);
    glutAddMenuEntry(" m1 -item 2",2);
    glutAddMenuEntry(" m1 -item 3",3);
-   glutAddSubMenu  (" m1 -item 4- sub",subm);
+   glutAddSubMenu  (" m1 -item 4- sub",subm1);
    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
    glutChangeToMenuEntry( 2, " m1 -item 2, modificado", 2 );
    glutChangeToMenuEntry( 4, " m1 -item 4, sub quitado", 4 );
 
+   glutAddSubMenu( "m1 -item 5 - sub aniadido",subm1 );
 
 
+   int subm2 = glutCreateMenu( menuFunc2 );
+   glutAddMenuEntry("m2 submenu 1",21);
+   glutAddMenuEntry("m2 submenu 2",22);
+   glutAddMenuEntry("m2 submenu 3",23);
 
    glutInitWindowPosition( 200, 200 );
    win2 = glutCreateWindow("cocoglut ventana 2");
@@ -253,7 +258,12 @@ int main( int argc, char * argv[] )
    glutAddMenuEntry(" m2 -item 1",4);
    glutAddMenuEntry(" m2 -item 2",5);
    glutAddMenuEntry(" m2 -item 3",6);
+
+
+
    glutAttachMenu( GLUT_RIGHT_BUTTON );
+
+      glutChangeToSubMenu( 2, " m2 -item 2 --changed to sub",subm2);
 
    glutMainLoop() ;
 
