@@ -1249,6 +1249,10 @@ MenuItem::MenuItem( const std::string & p_title, Menu * p_parentMenu,  Menu * p_
    [cocoaItem setEnabled:YES];
    [cocoaItem setSubmenu:subMenu->cocoaMenu];
 
+   // create the wrapper pointing to this object, set it as the target
+   wrapper = [[ccg_MenuItemWrapper alloc]init: this ] ;
+   [cocoaItem setTarget:(id)wrapper];
+
    // add this item to the list of items in the menu
    index = parentMenu->items.size()+1 ;
    parentMenu->items.push_back( this );

@@ -224,27 +224,27 @@ int main( int argc, char * argv[] )
    glutMotionFunc( Motion );
 
    int subm1 = glutCreateMenu( menuFunc1 );
-   glutAddMenuEntry("m1 submenu 1",11);
-   glutAddMenuEntry("m1 submenu 2",12);
-   glutAddMenuEntry("m1 submenu 3",13);
+   glutAddMenuEntry("m1 submenu 1 --11",11);
+   glutAddMenuEntry("m1 submenu 2 --12",12);
+   glutAddMenuEntry("m1 submenu 3 --13",13);
 
    glutCreateMenu( menuFunc1 );
-   glutAddMenuEntry(" m1 -item 1",1);
-   glutAddMenuEntry(" m1 -item 2",2);
-   glutAddMenuEntry(" m1 -item 3",3);
-   glutAddSubMenu  (" m1 -item 4- sub",subm1);
+   glutAddMenuEntry("m1 -item 1",1);
+   glutAddMenuEntry("m1 -item 2",2);
+   glutAddMenuEntry("m1 -item 3",3);
+   glutAddSubMenu  ("m1 -item 4- sub",subm1);
    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
-   glutChangeToMenuEntry( 2, " m1 -item 2, modificado", 2 );
-   glutChangeToMenuEntry( 4, " m1 -item 4, sub quitado", 4 );
+   glutChangeToMenuEntry( 2, "m1 -item 2, modificado --2", 2 );
+   glutChangeToMenuEntry( 4, "m1 -item 4, sub quitado --4", 4 );
 
    glutAddSubMenu( "m1 -item 5 - sub aniadido",subm1 );
 
 
    int subm2 = glutCreateMenu( menuFunc2 );
-   glutAddMenuEntry("m2 submenu 1",21);
-   glutAddMenuEntry("m2 submenu 2",22);
-   glutAddMenuEntry("m2 submenu 3",23);
+   glutAddMenuEntry("m2 submenu 1 -21",21);
+   glutAddMenuEntry("m2 submenu 2 -22",22);
+   glutAddMenuEntry("m2 submenu 3 -23",23);
 
    glutInitWindowPosition( 200, 200 );
    win2 = glutCreateWindow("cocoglut ventana 2");
@@ -255,15 +255,15 @@ int main( int argc, char * argv[] )
 
 
    glutCreateMenu( menuFunc2 );
-   glutAddMenuEntry(" m2 -item 1",4);
-   glutAddMenuEntry(" m2 -item 2",5);
-   glutAddMenuEntry(" m2 -item 3",6);
+   glutAddMenuEntry("m2 -item 1 -- 4",4);
+   glutAddMenuEntry("m2 -item 2 -- 5",5);
+   glutAddMenuEntry("m2 -item 3 -- 6",6);
 
 
 
    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
-      glutChangeToSubMenu( 2, " m2 -item 2 --changed to sub",subm2);
+   glutChangeToSubMenu( 2, " m2 -item 2 --changed to sub",subm2);
 
    glutMainLoop() ;
 
