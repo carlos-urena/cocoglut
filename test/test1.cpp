@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cocoglut-api.hpp>
+#include <vector>
 #include <OpenGL/gl.h>
 
 using namespace cocoglut ;
@@ -45,21 +46,59 @@ void InformeOpenGL(  )
 
 }
 
+void DrawTrianguloBE()
+{
+   glBegin(GL_TRIANGLES);
+      glColor3f( 1.0, 0.0, 0.0 ); glVertex3f(  0.0,  0.9, 0.0 );
+      glColor3f( 0.0, 1.0, 0.0 ); glVertex3f( -0.9, -0.9, 0.0 );
+      glColor3f( 0.0, 0.0, 1.0 ); glVertex3f( +0.9, -0.9 ,0.0 );
+   glEnd();
+}
+
+void DrawTrianguloDA()
+{
+   const std::vector<float> vertices =
+   {   0.0,  0.9, 0.0,
+      -0.9, -0.9, 0.0,
+       0.9, -0.9, 0.0
+    } ;
+
+    const std::vector<float> colores =
+    {  1.0, 0.0, 0.0,
+       0.0, 1.0, 0.0,
+       0.0, 0.0, 1.0
+    } ;
+
+    // especificar y habilitar puntero a vértices
+    glVertexPointer( 3, GL_FLOAT, 0, vertices.data() );
+    glEnableClientState( GL_VERTEX_ARRAY );
+
+    // especificar y habilitar puntero a colores
+    glColorPointer( 3, GL_FLOAT, 0, colores.data() );
+    glEnableClientState( GL_COLOR_ARRAY );
+
+    // dibujar
+    glDrawArrays( GL_TRIANGLES, 0, vertices.size()/3 ) ;
+
+    // deshabilitar punteros a vértices y colores
+    glDisableClientState( GL_VERTEX_ARRAY );
+    glDisableClientState( GL_COLOR_ARRAY );
+}
+
 // -----------------------------------------------------------------------------
 void Redraw1( void )
 {
    logt1("begins: Redraw1" );
    InformeOpenGL() ;
 
-   glClearColor(0.2, 0.2, 0.3, 0);
+   glClearColor(1.0, 1.0, 1.0, 0.0 );
    glClear(GL_COLOR_BUFFER_BIT);
 
-   glColor3f( 0.2, 0.5, 1.0 );
-   glBegin(GL_TRIANGLES);
-      glVertex3f(  0.0,  0.9, 0.0);
-      glVertex3f( -0.9, -0.9, 0.0);
-      glVertex3f( +0.9, -0.9 ,0.0);
-   glEnd();
+   glShadeModel( GL_SMOOTH );
+
+   //DrawTrianguloBE() ;
+   DrawTrianguloDA() ;
+
 
    glutSwapBuffers() ;
    logt1("ends  : Redraw1" );
@@ -92,18 +131,14 @@ void Redraw2( void )
    logt1("begins: Redraw2") ;
    InformeOpenGL() ;
 
-   glClearColor(0.3, 0.2, 0.2, 0);
+   glClearColor( 1.0, 1.0, 1.0, 0.0 );
    glClear(GL_COLOR_BUFFER_BIT);
-
+   glShadeModel( GL_FLAT );
    glMatrixMode( GL_MODELVIEW );
    glPushMatrix() ;
       glRotatef( ang, 0.0, 0.0, 1.0 );
-      glColor3f( 1.0, 0.2, 0.2 );
-      glBegin(GL_TRIANGLES);
-         glVertex3f(  0.0,  0.9, 0.0);
-         glVertex3f( -0.9, -0.9, 0.0);
-         glVertex3f( +0.9, -0.9 ,0.0);
-      glEnd();
+      //DrawTrianguloBE() ;
+      DrawTrianguloDA() ;
    glPopMatrix();
 
 
