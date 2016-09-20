@@ -1,3 +1,25 @@
+// *********************************************************************
+// **
+// ** Cocoglut test program
+// **
+// ** Copyright (C) 2016 Carlos Ureña
+// **
+// ** This program is free software: you can redistribute it and/or modify
+// ** it under the terms of the GNU General Public License as published by
+// ** the Free Software Foundation, either version 3 of the License, or
+// ** (at your option) any later version.
+// **
+// ** This program is distributed in the hope that it will be useful,
+// ** but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// ** GNU General Public License for more details.
+// **
+// ** You should have received a copy of the GNU General Public License
+// ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// **
+//
+
+#include <cassert>
 #include <iostream>
 #include <cocoglut-api.hpp>
 #include <vector>
@@ -20,33 +42,38 @@ const float dang = 6.0 ;
 //#define logt1( msg )  cout << "test1: debug: " << msg << endl << flush
 #define logt1( msg )
 
+
+bool idleIsActived = false ;
+
 // -----------------------------------------------------------------------------
 
-void InformeOpenGL(  )
+void OpenGLReport(  )
 {
-
-   static bool noprimera = false ;
-   if ( noprimera )
-      return ;
-   noprimera = true ;
-
    GLint acc_r, acc_g, acc_b ;
    glGetIntegerv( GL_ACCUM_RED_BITS,   &acc_r );
    glGetIntegerv( GL_ACCUM_GREEN_BITS, &acc_g );
    glGetIntegerv( GL_ACCUM_BLUE_BITS,  &acc_b );
 
+   GLboolean depthTestEnabled ;
+   GLint     depthTestBits ;
+   glGetBooleanv( GL_DEPTH_TEST, &depthTestEnabled );
+   glGetIntegerv( GL_DEPTH_BITS, &depthTestBits );
+
    using namespace std ;
    cout  << "OpenGL implementation info:" << endl
-         << "    implementation vendor     == " << glGetString(GL_VENDOR)  << endl
-         << "    hardware                  == " << glGetString(GL_RENDERER) << endl
+         << "    Implementation vendor     == " << glGetString(GL_VENDOR)  << endl
+         << "    Renderer (GPU)            == " << glGetString(GL_RENDERER) << endl
          << "    OpenGL version            == " << glGetString(GL_VERSION) << endl
          << "    GLSL version              == " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl
-         << "    accum buffer bits (r,g,b) == " << "(" << acc_r << "," << acc_g << "," << acc_b << ")" << endl
+         << "    Accum. buffer bits (rgb)  == " << "(" << acc_r << "," << acc_g << "," << acc_b << ")" << endl
+         << "    Depth test is enabled     == " << ( depthTestEnabled == GL_TRUE ? "yes" : "no" ) << endl
+         << "    Depth buffer num. bits    == " << depthTestBits << endl
+         //<< "    Extensions:" << glGetString(GL_EXTENSIONS) << endl
          << flush ;
-
 }
+// -----------------------------------------------------------------------------
 
-void DrawTrianguloBE()
+void DrawTriangleBE()
 {
    glBegin(GL_TRIANGLES);
       glColor3f( 1.0, 0.0, 0.0 ); glVertex3f(  0.0,  0.9, 0.0 );
@@ -54,8 +81,42 @@ void DrawTrianguloBE()
       glColor3f( 0.0, 0.0, 1.0 ); glVertex3f( +0.9, -0.9 ,0.0 );
    glEnd();
 }
+// -----------------------------------------------------------------------------
+void DrawPrimitive3( int primitiveType,
+                     const std::vector<float> & vertices,
+                     const std::vector<float> & colors )
+{
 
-void DrawTrianguloDA()
+   assert( vertices.size() % 3 == 0 && vertices.size() > 0 );
+
+   if (colors.size() == 3 )
+      glColor4f( colors[0], colors[1], colors[2], 1.0 );
+   else if (colors.size() > 0 )
+      assert( colors.size() == vertices.size());
+
+   const bool sendColorsArray = colors.size() > 3 ;
+
+   // specify and enable pointer to vertex array
+   glVertexPointer( 3, GL_FLOAT, 0, vertices.data() );
+   glEnableClientState( GL_VERTEX_ARRAY );
+
+   // specify and enable pointer to colors array
+   if ( sendColorsArray )
+   {  glColorPointer( 3, GL_FLOAT, 0, colors.data() );
+      glEnableClientState( GL_COLOR_ARRAY );
+   }
+
+   // draw the polygon
+   glDrawArrays( primitiveType, 0, vertices.size()/3 ) ;
+
+   // disable vertex and color arrays
+   glDisableClientState( GL_VERTEX_ARRAY );
+   if ( sendColorsArray )
+      glDisableClientState( GL_COLOR_ARRAY );
+}
+// -----------------------------------------------------------------------------
+
+void DrawTriangleDA()
 {
    const std::vector<float> vertices =
    {   0.0,  0.9, 0.0,
@@ -63,42 +124,62 @@ void DrawTrianguloDA()
        0.9, -0.9, 0.0
     } ;
 
-    const std::vector<float> colores =
+    const std::vector<float> colors =
     {  1.0, 0.0, 0.0,
        0.0, 1.0, 0.0,
        0.0, 0.0, 1.0
     } ;
 
-    // especificar y habilitar puntero a vértices
-    glVertexPointer( 3, GL_FLOAT, 0, vertices.data() );
-    glEnableClientState( GL_VERTEX_ARRAY );
-
-    // especificar y habilitar puntero a colores
-    glColorPointer( 3, GL_FLOAT, 0, colores.data() );
-    glEnableClientState( GL_COLOR_ARRAY );
-
-    // dibujar
-    glDrawArrays( GL_TRIANGLES, 0, vertices.size()/3 ) ;
-
-    // deshabilitar punteros a vértices y colores
-    glDisableClientState( GL_VERTEX_ARRAY );
-    glDisableClientState( GL_COLOR_ARRAY );
+    DrawPrimitive3( GL_TRIANGLES, vertices, colors );
 }
-
 // -----------------------------------------------------------------------------
+
+void DrawTrianglesDepthTest()
+{
+    //
+    const std::vector<float> vertices1 =
+    {  -0.5, -0.5, 0.0,
+        0.5, -0.5, 0.0,
+       -0.5,  0.5, 0.0
+    } ;
+
+    const std::vector<float> color1 = {  1.0, 0.0, 0.0 } ;
+
+    const std::vector<float> vertices2 =
+    {   -0.7, -0.7,  0.5,
+         0.5,  0.0, -0.5,
+         0.0,  0.5, -0.5
+    } ;
+    const std::vector<float> color2 = {  0.0, 0.0, 1.0 } ;
+
+    DrawPrimitive3( GL_TRIANGLES, vertices1, color1 );
+    DrawPrimitive3( GL_TRIANGLES, vertices2, color2 );
+}
+// -----------------------------------------------------------------------------
+
 void Redraw1( void )
 {
+   cout << "redraw 1" << endl << flush ;
+
+   static bool primera = true ;
+   if ( primera )
+      OpenGLReport() ;
+   primera = false ;
+
    logt1("begins: Redraw1" );
-   InformeOpenGL() ;
+
+
 
    glClearColor(1.0, 1.0, 1.0, 0.0 );
-   glClear(GL_COLOR_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT );
 
-   glShadeModel( GL_SMOOTH );
+   // smooth/flat shading test
+   //glShadeModel( GL_SMOOTH );
+   //DrawTriangleDA() ;
 
-   //DrawTrianguloBE() ;
-   DrawTrianguloDA() ;
-
+   // depth test
+   glEnable( GL_DEPTH_TEST );
+   DrawTrianglesDepthTest() ;
 
    glutSwapBuffers() ;
    logt1("ends  : Redraw1" );
@@ -128,27 +209,37 @@ void Keyboard1( unsigned char key, int x, int y )
 
 void Redraw2( void )
 {
+
+      cout << "redraw 2" << endl << flush ;
    logt1("begins: Redraw2") ;
-   InformeOpenGL() ;
+
+   static bool primera = true ;
+   if ( primera )
+      OpenGLReport() ;
+   primera = false ;
 
    glClearColor( 1.0, 1.0, 1.0, 0.0 );
-   glClear(GL_COLOR_BUFFER_BIT);
-   glShadeModel( GL_FLAT );
+
+   glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT );
+
    glMatrixMode( GL_MODELVIEW );
    glPushMatrix() ;
       glRotatef( ang, 0.0, 0.0, 1.0 );
-      //DrawTrianguloBE() ;
-      DrawTrianguloDA() ;
-   glPopMatrix();
 
+      // smooth/flat shading test
+      //glShadeModel( GL_FLAT );
+      //DrawTriangleDA() ;
+      // depth test test
+      glDisable( GL_DEPTH_TEST );
+      DrawTrianglesDepthTest() ;
+
+   glPopMatrix();
 
    glutSwapBuffers() ;
    logt1("ends  : Redraw2") ;
 
 }
 // -----------------------------------------------------------------------------
-
-bool idleActivado = false ;
 
 void IdleFunc2( void )
 {
@@ -166,6 +257,7 @@ void IdleFunc2( void )
 
     logt1("ends  : IdleFunc2()") ;
 }
+// -----------------------------------------------------------------------------
 
 void Keyboard2( unsigned char key, int x, int y )
 {
@@ -192,8 +284,8 @@ void Keyboard2( unsigned char key, int x, int y )
    }
    else if ( key == 'i' || key == 'I' )
    {
-      idleActivado = ! idleActivado ;
-      if ( idleActivado )
+      idleIsActived = ! idleIsActived ;
+      if ( idleIsActived )
       {
           glutIdleFunc( IdleFunc2 );
       }
@@ -231,18 +323,18 @@ void Motion( int x, int y )
    logt1("called: Motion(" << x << "," << y << ")" ) ;
 
 }
+// -----------------------------------------------------------------------------
 
 void menuFunc1( int value )
 {
    cout << "called: menuFunc1(" << value << ")" << endl << flush ;
 }
+// -----------------------------------------------------------------------------
 
 void menuFunc2( int value )
 {
    cout << "called: menuFunc2(" << value << ")" << endl << flush ;
 }
-
-
 // -----------------------------------------------------------------------------
 
 int main( int argc, char * argv[] )
@@ -251,6 +343,7 @@ int main( int argc, char * argv[] )
 
    glutInit( &argc, argv ) ;
 
+   glutInitDisplayMode( CCG_OPENGL_2 );
    glutInitWindowPosition( 100, 100 );
    win1 = glutCreateWindow("cocoglut ventana 1" ) ;
    glutDisplayFunc( Redraw1 );
