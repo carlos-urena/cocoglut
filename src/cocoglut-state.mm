@@ -243,7 +243,7 @@ void LibraryState::reshape( const int windowId )
    logd("    frame size == " << frame.size.width << " x " << frame.size.height ) ;
 
    // compute pixels units
-   const int factor = 2 ; // should use cocoa conversion functions here!!!
+   const int factor = 1 ; // (it was 2??) should use cocoa conversion functions here!!!
    const int pixWidth   = int(frame.size.width * factor),
              pixHeight  = int(frame.size.height * factor);
 
@@ -293,48 +293,48 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
    // set glut event data from cocoa event type
    switch( event.type )
    {
-      case NSLeftMouseDown:
-         typeDesc    = "NSLeftMouseDown:" ;
+      case NSEventTypeLeftMouseDown:
+         typeDesc    = "NSEventTypeLeftMouseDown:" ;
          isMouse     = true ;
          mouseButton = GLUT_LEFT_BUTTON ;
          typeUpDown  = GLUT_DOWN ;
          break ;
-      case NSRightMouseDown:
-         typeDesc    = "NSRightMouseDown:" ;
+      case NSEventTypeRightMouseDown:
+         typeDesc    = "NSEventTypeRightMouseDown:" ;
          isMouse     = true ;
          mouseButton = GLUT_RIGHT_BUTTON ;
          typeUpDown  = GLUT_DOWN ;
          break ;
-      case NSOtherMouseDown:
-         typeDesc    = "NSOtherMouseDown:" ;
+      case NSEventTypeOtherMouseDown:
+         typeDesc    = "NSEventTypeOtherMouseDown:" ;
          isMouse     = true ;
          mouseButton = GLUT_MIDDLE_BUTTON ; // we assume cocoa 'other' is glut 'middle' ¿?
          typeUpDown  = GLUT_DOWN ;
          break ;
-      case NSLeftMouseUp:
-         typeDesc    = "NSLeftMouseUp:" ;
+      case NSEventTypeLeftMouseUp:
+         typeDesc    = "NSEventTypeLeftMouseUp:" ;
          isMouse     = true ;
          mouseButton = GLUT_LEFT_BUTTON ;
          typeUpDown  = GLUT_UP ;
          break ;
-      case NSRightMouseUp:
-         typeDesc    = "NSRightMouseUp:" ;
+      case NSEventTypeRightMouseUp:
+         typeDesc    = "NSEventTypeRightMouseUp:" ;
          isMouse     = true ;
          mouseButton = GLUT_RIGHT_BUTTON ;
          typeUpDown  = GLUT_UP ;
          break ;
-      case NSLeftMouseDragged:
-         typeDesc    = "NSLeftMouseDragged:" ;
+      case NSEventTypeLeftMouseDragged:
+         typeDesc    = "NSEventTypeLeftMouseDragged:" ;
          isDragged   = true ;
          isMouse     = true ;
          break ;
-      case NSKeyDown:
-         typeDesc    = "NSKeyDown:" ;
+      case NSEventTypeKeyDown:
+         typeDesc    = "NSEventTypeKeyDown:" ;
          isKey       = true ;
          typeUpDown  = GLUT_DOWN ;
          break ;
-      case NSKeyUp:
-         typeDesc    = "NSKeyUp:" ;
+      case NSEventTypeKeyUp:
+         typeDesc    = "NSEventTypeKeyUp:" ;
          isKey       = true ;
          typeUpDown  = GLUT_UP ;
          break ;
@@ -413,7 +413,7 @@ bool LibraryState::handleEvent( const int windowId, NSEvent * event )
       std::string     skd ;                  // special key description
 
       // check for special arrow keys
-      if ([event modifierFlags] & NSNumericPadKeyMask)
+      if ([event modifierFlags] & NSEventModifierFlagNumericPad)
       {
          if ( [charactersIM length] == 1 )
          {
@@ -566,10 +566,10 @@ int LibraryState::createWindow( const char *name )
    // allocate window
    NSWindow * newWindow = [[NSWindow alloc]
       initWithContentRect: contentSize
-      styleMask:           NSTitledWindowMask |
-                           NSClosableWindowMask |
-                           NSMiniaturizableWindowMask |
-                           NSResizableWindowMask
+      styleMask:           NSWindowStyleMaskTitled |
+                           NSWindowStyleMaskClosable |
+                           NSWindowStyleMaskMiniaturizable |
+                           NSWindowStyleMaskResizable
       backing:             NSBackingStoreBuffered
       defer:               YES   // will it be shown on 'app did finish launch....' event
       //defer:               NO
